@@ -13,9 +13,7 @@ import asyncio
 import logging
 import threading
 import warnings
-
-url = "https://192.168.8.1/"
-query_id = 0
+import utils
 
 
 class GlInet:
@@ -90,34 +88,14 @@ class GlInet:
             raise ConnectionError(resp.json())
         return self.__create_object(resp.json(), method, params)
 
-    def __create_recursive_object(self, obj, obj_name):
-        if isinstance(obj, dict):
-            fields = sorted(obj.keys())
-            namedtuple_type = namedtuple(
-                typename=obj_name,
-                field_names=fields,
-                rename=True,
-            )
-            field_value_pairs = OrderedDict(
-                (str(field), self.__create_recursive_object(obj[field], obj_name)) for field in fields)
-            try:
-                return namedtuple_type(**field_value_pairs)
-            except TypeError:
-                # Cannot create namedtuple instance so fallback to dict (invalid attribute names)
-                return dict(**field_value_pairs)
-        elif isinstance(obj, (list, set, tuple, frozenset)):
-            return [self.__create_recursive_object(item, obj_name) for item in obj]
-        else:
-            return obj
-
     def __create_object(self, json_data, method, params):
 
         if method == "call":
             typename = f"{params[0]}__{params[1]}"
             typename = re.sub(r"[,\-!/]", "_", typename)
-            return self.__create_recursive_object(json_data, typename)
+            return utils.create_recursive_object(json_data, typename)
         else:
-            return self.__create_recursive_object(json_data, f"{method}")
+            return utils.create_recursive_object(json_data, f"{method}")
 
     def __challenge_login(self):
         resp = self.request("challenge", {"username": self.username})
@@ -169,6 +147,10 @@ class GlInet:
         openssl_pwd = self.__generate_openssl_passwd(challenge.alg, challenge.salt)
         hash = hashlib.md5(f'{self.username}:{openssl_pwd}:{challenge.nonce}'.encode()).hexdigest()
         return hash
+
+    def wg_client__get_all_config(self):
+        pass
+
 
 
 if __name__ == "__main__":
