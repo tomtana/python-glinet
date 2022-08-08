@@ -1,3 +1,5 @@
+import time
+
 import requests
 import crypt
 import hashlib
@@ -7,6 +9,9 @@ import exceptions
 from decorators import login_required
 from collections import namedtuple, OrderedDict
 import re
+import asyncio
+import logging
+import threading
 
 url = "https://192.168.8.1/"
 query_id = 0
@@ -15,17 +20,21 @@ query_id = 0
 class GlInet:
 
     def __init__(self, url="https://192.168.8.1/rpc", username="root", password=None,
-                 protocol_version="2.0"):
+                 protocol_version="2.0", keep_alive=True, keep_alive_intervall = 30):
         self.url = url
         self.query_id = 0
         if password is None:
-            self.password = getpass.getpass(prompt='Enter your AXT-1800 password')
+            self.password = getpass.getpass(prompt='Enter your GL-Inet password')
         else:
             self.password = password
         self.username = username
         self.protocol_version = protocol_version
         self.session = requests.session()
         self.sid = None
+        self._keep_alive = keep_alive
+        self._keep_alive_intervall = keep_alive_intervall
+        self._thread = None
+        self._lock = threading.Lock()
 
     def __generate_query_id(self):
         qid = self.query_id
@@ -61,7 +70,9 @@ class GlInet:
 
     def request(self, method, params):
         req = self.__generate_request(method, params)
+        self._lock.acquire()
         resp = self.session.post(self.url, json=req, verify=False)
+        self._lock.release()
         if resp.json().get("error", None):
             error_ = resp.json().get("error")
             if error_["code"] == -32000:
@@ -74,34 +85,34 @@ class GlInet:
             raise ConnectionError(resp.json())
         return self.__create_object(resp.json(), method, params)
 
-    def __create_object(self, json_data, method, params):
+    def __create_recursive_object(self, obj, obj_name):
+        if isinstance(obj, dict):
+            fields = sorted(obj.keys())
+            namedtuple_type = namedtuple(
+                typename=obj_name,
+                field_names=fields,
+                rename=True,
+            )
+            field_value_pairs = OrderedDict(
+                (str(field), self.__create_recursive_object(obj[field], obj_name)) for field in fields)
+            try:
+                return namedtuple_type(**field_value_pairs)
+            except TypeError:
+                # Cannot create namedtuple instance so fallback to dict (invalid attribute names)
+                return dict(**field_value_pairs)
+        elif isinstance(obj, (list, set, tuple, frozenset)):
+            return [self.__create_recursive_object(item, obj_name) for item in obj]
+        else:
+            return obj
 
-        def create_recursive_object(obj, obj_name):
-            if isinstance(obj, dict):
-                fields = sorted(obj.keys())
-                namedtuple_type = namedtuple(
-                    typename=obj_name,
-                    field_names=fields,
-                    rename=True,
-                )
-                field_value_pairs = OrderedDict(
-                    (str(field), create_recursive_object(obj[field], obj_name)) for field in fields)
-                try:
-                    return namedtuple_type(**field_value_pairs)
-                except TypeError:
-                    # Cannot create namedtuple instance so fallback to dict (invalid attribute names)
-                    return dict(**field_value_pairs)
-            elif isinstance(obj, (list, set, tuple, frozenset)):
-                return [create_recursive_object(item, obj_name) for item in obj]
-            else:
-                return obj
+    def __create_object(self, json_data, method, params):
 
         if method == "call":
             typename = f"{params[0]}__{params[1]}"
             typename = re.sub(r"[,\-!/]", "_", typename)
-            return create_recursive_object(json_data, typename)
+            return self.__create_recursive_object(json_data, typename)
         else:
-            return create_recursive_object(json_data, f"{method}")
+            return self.__create_recursive_object(json_data, f"{method}")
 
     def __challenge_login(self):
         resp = self.request("challenge", {"username": self.username})
@@ -113,7 +124,22 @@ class GlInet:
         resp = self.request("login", {"username": self.username,
                                       "hash": hash})
         self.sid = resp.result.sid
+
+        #start keep alive thread
+        if self._keep_alive:
+            self._thread = threading.Thread(target=self.__keep_alive)
+            self._thread.start()
         return True
+
+    def __keep_alive(self):
+        logging.info(f"Starting keep alive thread at intvervall {self._keep_alive_intervall}")
+        while self._keep_alive:
+            logging.debug(f"keep alive with intervall {self._keep_alive_intervall}")
+            if not self.is_alive():
+                logging.warning("client disconnected, trying to login again..")
+                self.login()
+            time.sleep(self._keep_alive_intervall)
+        logging.info("Keep alive halted.")
 
     @login_required
     def is_alive(self):
@@ -142,4 +168,4 @@ class GlInet:
 
 client = GlInet()
 client.login()
-#r = client.request("call", ["ovpn-server", "get_config", {}])
+# r = client.request("call", ["ovpn-server", "get_config", {}])

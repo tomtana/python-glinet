@@ -10,3 +10,4 @@ def login_required(func):
         return func(self, *args, **kwargs)
 
     return inner_func
+
