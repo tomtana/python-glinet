@@ -12,6 +12,7 @@ import re
 import asyncio
 import logging
 import threading
+import warnings
 
 url = "https://192.168.8.1/"
 query_id = 0
@@ -20,7 +21,7 @@ query_id = 0
 class GlInet:
 
     def __init__(self, url="https://192.168.8.1/rpc", username="root", password=None,
-                 protocol_version="2.0", keep_alive=True, keep_alive_intervall = 30):
+                 protocol_version="2.0", keep_alive=True, keep_alive_intervall = 30, verify_ssl_certificate=False):
         self.url = url
         self.query_id = 0
         if password is None:
@@ -35,6 +36,10 @@ class GlInet:
         self._keep_alive_intervall = keep_alive_intervall
         self._thread = None
         self._lock = threading.Lock()
+        self._verify_ssl_certificate = verify_ssl_certificate
+        if self._verify_ssl_certificate is False:
+            logging.warning("You disabled ssl certificate validation. Further warning messages will be deactivated.")
+            warnings.filterwarnings('ignore', message='Unverified HTTPS request')
 
     def __generate_query_id(self):
         qid = self.query_id
@@ -166,6 +171,7 @@ class GlInet:
         return hash
 
 
-client = GlInet()
-client.login()
-# r = client.request("call", ["ovpn-server", "get_config", {}])
+if __name__ == "__main__":
+    client = GlInet()
+    client.login()
+    # r = client.request("call", ["ovpn-server", "get_config", {}])
