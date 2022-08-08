@@ -19,8 +19,14 @@ from tabulate import tabulate
 
 class GlInetBase:
 
-    def __init__(self, url="https://192.168.8.1/rpc", username="root", password=None,
-                 protocol_version="2.0", keep_alive=True, keep_alive_intervall=30, verify_ssl_certificate=False,
+    def __init__(self,
+                 url="https://192.168.8.1/rpc",
+                 username="root",
+                 password=None,
+                 protocol_version="2.0",
+                 keep_alive=True,
+                 keep_alive_intervall=30,
+                 verify_ssl_certificate=False,
                  api_reference_url="https://dev.gl-inet.cn/docs/api_docs_api/"):
         self.url = url
         self.query_id = 0
@@ -153,6 +159,7 @@ class GlInetBase:
         return hash
 
     def __load_api_desciption(self):
+        logging.info(f"Loading api description from {self._api_reference_url}")
         resp = requests.get(self._api_reference_url)
         api = resp.json()["data"]
         api = {utils.sanitize_string(i["module_name"][0]): i for i in api}
