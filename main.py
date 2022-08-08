@@ -14,6 +14,7 @@ import logging
 import threading
 import warnings
 import utils
+from tabulate import tabulate
 
 
 class GlInetBase:
@@ -184,10 +185,10 @@ class GlInetApiObject:
         return self._session.request("call", p)
 
     def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.__dict__)
+        return tabulate([[i.keyName, i.dataType__name, i.desp] for i in self.params], headers=["Parameter", "Type", "Description"])
 
     def __str__(self):
-        return str(self.__dict__)
+        self.__repr__()
 
 
 class GlInetApi:
@@ -207,23 +208,13 @@ class GlInetApi:
             return GlInetApi(value, self._session) if isinstance(value, dict) else value
 
     def __repr__(self):
-        return "%s(%r)" % (type(self).__name__, self.__dict__)
+        return tabulate([[i] for i in list(self.__dict__.keys()) if not i.startswith("_")], headers=["Function"])
 
     def __str__(self):
         return str(self.__dict__)
 
 
-"""    
-ApiObject ->
-
-wg-client, led, ovpn, etc..
-
-wg-client.description
-wg-client.get_bla_bli_blubb(parameter1, parameter2) 
- """
-
 if __name__ == "__main__":
     client = GlInetBase()
     client.login()
     api_client = client.get_api_client()
-    # r = client.request("call", ["ovpn-server", "get_config", {}])
