@@ -158,7 +158,7 @@ class GlInetBase:
         return api
 
     def get_api_client(self):
-        pass
+        return GlInetApi(self._api_desciption, self)
 
 
 class GlInetApiObject:
@@ -183,6 +183,12 @@ class GlInetApiObject:
         p = self.module_name + [self.data.title] + p
         return self._session.request("call", p)
 
+    def __repr__(self):
+        return "%s(%r)" % (type(self).__name__, self.__dict__)
+
+    def __str__(self):
+        return str(self.__dict__)
+
 
 class GlInetApi:
     def __init__(self, data, session):
@@ -200,6 +206,12 @@ class GlInetApi:
         else:
             return GlInetApi(value, self._session) if isinstance(value, dict) else value
 
+    def __repr__(self):
+        return "%s(%r)" % (type(self).__name__, self.__dict__)
+
+    def __str__(self):
+        return str(self.__dict__)
+
 
 """    
 ApiObject ->
@@ -213,4 +225,5 @@ wg-client.get_bla_bli_blubb(parameter1, parameter2)
 if __name__ == "__main__":
     client = GlInetBase()
     client.login()
+    api_client = client.get_api_client()
     # r = client.request("call", ["ovpn-server", "get_config", {}])
