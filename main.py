@@ -16,10 +16,11 @@ import warnings
 import utils
 
 
-class GlInet:
+class GlInetBase:
 
     def __init__(self, url="https://192.168.8.1/rpc", username="root", password=None,
-                 protocol_version="2.0", keep_alive=True, keep_alive_intervall = 30, verify_ssl_certificate=False):
+                 protocol_version="2.0", keep_alive=True, keep_alive_intervall=30, verify_ssl_certificate=False,
+                 api_reference_url="https://dev.gl-inet.cn/docs/api_docs_api/"):
         self.url = url
         self.query_id = 0
         if password is None:
@@ -38,6 +39,8 @@ class GlInet:
         if self._verify_ssl_certificate is False:
             logging.warning("You disabled ssl certificate validation. Further warning messages will be deactivated.")
             warnings.filterwarnings('ignore', message='Unverified HTTPS request')
+        self._api_reference_url = api_reference_url
+        self._api_desciption = self.__load_api_desciption()
 
     def __generate_query_id(self):
         qid = self.query_id
@@ -108,7 +111,7 @@ class GlInet:
                                       "hash": hash})
         self.sid = resp.result.sid
 
-        #start keep alive thread
+        # start keep alive thread
         if self._keep_alive:
             self._thread = threading.Thread(target=self.__keep_alive)
             self._thread.start()
@@ -148,12 +151,66 @@ class GlInet:
         hash = hashlib.md5(f'{self.username}:{openssl_pwd}:{challenge.nonce}'.encode()).hexdigest()
         return hash
 
-    def wg_client__get_all_config(self):
+    def __load_api_desciption(self):
+        resp = requests.get(self._api_reference_url)
+        api = resp.json()["data"]
+        api = {utils.sanitize_string(i["module_name"][0]): i for i in api}
+        return api
+
+    def get_api_client(self):
         pass
 
 
+class GlInetApiObject:
+    def __init__(self, data, session):
+        self._session = session
+        for name, value in data.items():
+            setattr(self, name, self._wrap(value))
+
+    def _wrap(self, value):
+        if isinstance(value, (tuple, list, set, frozenset)):
+            return type(value)([self._wrap(v) for v in value])
+        else:
+            return GlInetApi(value, self._session) if isinstance(value, dict) else value
+
+    def call(self):
+        self.__call__()
+
+    def __call__(self, params=None):
+        p = []
+        if params:
+            p = list(params)
+        p = self.module_name + [self.data.title] + p
+        return self._session.request("call", p)
+
+
+class GlInetApi:
+    def __init__(self, data, session):
+        self._session = session
+        if data.get("case_groups_data", None):
+            for name, value in data.get("case_groups_data").items():
+                setattr(self, name, GlInetApiObject(value, self._session))
+        else:
+            for name, value in data.items():
+                setattr(self, name, self._wrap(value))
+
+    def _wrap(self, value):
+        if isinstance(value, (tuple, list, set, frozenset)):
+            return type(value)([self._wrap(v) for v in value])
+        else:
+            return GlInetApi(value, self._session) if isinstance(value, dict) else value
+
+
+"""    
+ApiObject ->
+
+wg-client, led, ovpn, etc..
+
+wg-client.description
+wg-client.get_bla_bli_blubb(parameter1, parameter2) 
+ """
 
 if __name__ == "__main__":
-    client = GlInet()
+    client = GlInetBase()
     client.login()
     # r = client.request("call", ["ovpn-server", "get_config", {}])

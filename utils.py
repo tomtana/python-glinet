@@ -1,4 +1,5 @@
 from collections import namedtuple, OrderedDict
+import re
 
 
 def create_recursive_object(obj, obj_name):
@@ -20,3 +21,7 @@ def create_recursive_object(obj, obj_name):
         return [create_recursive_object(item, obj_name) for item in obj]
     else:
         return obj
+
+
+def sanitize_string(string):
+    return re.sub(r"[,\-!/]", "_", string)
