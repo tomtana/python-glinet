@@ -58,7 +58,7 @@ Per default the following steps are executed:
   - if no success ask via prompt
 - try to load api reference from persistence, otherwise load it from the web
 - persist settings
-- start background thread to keep connectio alive
+- start background thread to keep connection alive
 
 ```python
 from pyglinet import GlInet
