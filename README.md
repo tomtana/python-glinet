@@ -21,6 +21,12 @@ start the shell first and then load the module.
 
 ## Installation:
 
+### PiP
+```
+pip install python-glinet
+```
+
+### Clone Repo
 ```
 #clone repository
 git clone https://github.com/tomtana/python-glinet.git
