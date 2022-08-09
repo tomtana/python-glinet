@@ -11,6 +11,18 @@ def login_required(func):
 
     return inner_func
 
+def logout_required(func):
+    @wraps(func)
+    def inner_func(self, *args, **kwargs):
+        try:
+            if self.is_alive():
+                raise exceptions.LoggedInError("Logout before calling login again.")
+        except exceptions.NotLoggedInError:
+            pass
+
+        return func(self, *args, **kwargs)
+
+    return inner_func
 
 def has_sid(func):
     try:

@@ -82,6 +82,7 @@ class GlInet:
         self._api_reference_cache_path = os.path.join(self._cache_folder, "api_reference.pkl")
         self._api_reference_url = api_reference_url
         self._api_desciption = self.__load_api_desciption(update_api_reference_cache)
+        self._keep_alive_interrupt_event = threading.Event()
 
     def __generate_query_id(self):
         """
@@ -175,31 +176,25 @@ class GlInet:
         resp = self.request("challenge", {"username": self.username})
         return resp.result
 
+    @decorators.logout_required
     def login(self):
         """
         Login
 
-        Login and start background thread for keep_alive is configured.
+        Login and start background thread for keep_alive is configured. If password was set,
+        cached values will be ignored.
         :return: True
         """
         challenge = self.__challenge_login()
-        # try to load persisted login details
-        if self._cached_login_data is None and os.path.exists(self._login_cache_path):
-            with open(self._login_cache_path, "rb") as f:
-                try:
-                    loaded_data = pickle.load(f)
-                    if loaded_data:
-                        self._cached_login_data = loaded_data
-                except:
-                    logging.warning(f"Something went wrong loading file {self._login_cache_path}")
-        if ((self._cached_login_data is None and self._password is None) or
-                self._cached_login_data.get("username", None) != self.username or
-                self._cached_login_data.get("salt", None) != challenge.salt or
-                self._cached_login_data.get("alg") != challenge.alg):
-            self.__update_login_cache(challenge)
+        if self._password is None:
+            self._cached_login_data = self.__load_if_exist(self._login_cache_path)
+            if not self._cached_login_data:
+                self.__update_login_and_cache(challenge, update_password=True)
+        else:
+            self.__update_login_and_cache(challenge, update_password=False)
 
         try:
-            #call challenge again since otherwise it will timeout
+            # call challenge again since otherwise it will timeout
             challenge = self.__challenge_login()
             login_hash = self.__generate_login_hash(challenge)
             resp = self.request("login", {"username": self.username,
@@ -211,25 +206,61 @@ class GlInet:
             os.remove(self._login_cache_path)
             raise
 
-
         # start keep alive thread
         if self._keep_alive:
-            self._thread = threading.Thread(target=self.__keep_alive)
-            self._thread.start()
+            self._start_keep_alive_thread()
         return True
 
-    def __update_login_cache(self, challenge):
-        self._password = getpass.getpass(prompt='Enter your GL-Inet password')
-        _hash = self.__generate_unix_passwd_hash(challenge.alg, challenge.salt)
+    @decorators.login_required
+    def _start_keep_alive_thread(self):
+        if self._thread is None or not self._thread.is_alive():
+            logging.debug("Starting background keep alive thread.")
+            self._keep_alive_interrupt_event.clear()
+            self._thread = threading.Thread(target=self.__keep_alive)
+            self._thread.start()
+
+    def _stop_keep_alive_thread(self):
+        logging.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
+        self._keep_alive_interrupt_event.set()
+
+    def __update_login_and_cache(self, challenge, update_password=False):
+        password = self._password
+
+        if update_password:
+            password = getpass.getpass(prompt='Enter your GL-Inet password')
+
+        _hash = self.__generate_unix_passwd_hash(password, challenge.alg, challenge.salt)
         login_data = {"username": self.username,
                       "hash": _hash,
                       "salt": challenge.salt,
                       "alg": challenge.alg}
         if login_data != self._cached_login_data:
             self._cached_login_data = login_data
-            with open(self._login_cache_path, "wb") as f:
-                pickle.dump(self._cached_login_data, f)
-        self._password = None
+            self.__dump_to_file(self._cached_login_data, self._login_cache_path)
+
+    def __load_if_exist(self, file):
+        """
+        Load pickle file if it exists.
+        :param file: path to file
+        :return: None if file doesnt exist, else Data
+        """
+        loaded_data = None
+        if os.path.exists(file):
+            with open(file, "rb") as f:
+                try:
+                    loaded_data = pickle.load(f)
+                except:
+                    logging.warning(f"Something went wrong loading file {file}")
+        return loaded_data
+
+    def __dump_to_file(self, obj, file):
+        """
+        Dump pickle data to file.
+        :param file: path to file
+        :return: None
+        """
+        with open(file, "wb") as f:
+            pickle.dump(obj, f)
 
     def __keep_alive(self):
         """
@@ -240,7 +271,7 @@ class GlInet:
         :return: None
         """
         logging.info(f"Starting keep alive thread at intvervall {self._keep_alive_intervall}")
-        while self._keep_alive:
+        while self._keep_alive and not self._keep_alive_interrupt_event.is_set():
             logging.debug(f"keep alive with intervall {self._keep_alive_intervall}")
             if not self.is_alive():
                 logging.warning("client disconnected, trying to login again..")
@@ -265,21 +296,22 @@ class GlInet:
     @decorators.login_required
     def logout(self):
         """
-        Logout
+        Logout and stop keep alive thread
         :return: True
         """
         self.request("logout", {"sid": self.sid})
         self.sid = None
+        self._stop_keep_alive_thread()
         return True
 
-    def __generate_unix_passwd_hash(self, alg, salt):
+    def __generate_unix_passwd_hash(self, password, alg, salt):
         """
         Generate unix style hash with given algo and salt
         :param alg: algorithm
         :param salt: salt
         :return: hash
         """
-        return crypt.crypt(self._password, f"${alg}${salt}")
+        return crypt.crypt(password, f"${alg}${salt}")
 
     def __generate_login_hash(self, challenge):
         """
