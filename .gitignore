@@ -1,5 +1,5 @@
 /venv/
 .idea
 __*
-/python_glinet.egg-info/
+/python_glinet.egg-info/*
 /dist/
