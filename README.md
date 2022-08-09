@@ -17,7 +17,7 @@ start the shell first and then load the module.
 - Cache for api description and hashed login
 - Configure background thread to keep connection alive
 
-![](https://github.com/tomtana/python-glinet/ressources/python_glinet_demo.gif)
+![](/ressources/python_glinet_demo.gif)
 
 ## Installation:
 
