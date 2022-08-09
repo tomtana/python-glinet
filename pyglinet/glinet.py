@@ -11,7 +11,7 @@ import logging
 import threading
 import warnings
 from pyglinet import utils
-import pyglinet.api_helper as api_helper
+import pyglinet.glinet_api as api_helper
 import pathlib
 import pickle
 
