@@ -10,7 +10,7 @@ import re
 import logging
 import threading
 import warnings
-import utils
+from src.glinet import utils
 import api_helper
 import pathlib
 import pickle

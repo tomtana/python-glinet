@@ -18,6 +18,13 @@ start the shell first and then load the module.
 - Configure background thread to keep connection alive
 
 
+## Installation:
+clone repository
+```
+git clone https://github.com/tomtana/python-glinet.git
+```
+install package
+
 ## Examples:
 
 ### Login
