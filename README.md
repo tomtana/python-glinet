@@ -1,14 +1,15 @@
-# pyglinet - A Python 3 client for GL-Inet Router
+# python-glinet - A Python3 client for GL-Inet Router
 This package aims to provide full access to the GL-Inet Luci API for firmware versions >= 4.0 via json-rpc. 
 
 There is no official English documentation of the API yet. The lib parses the Chinese documentation from [here](https://dev.gl-inet.cn/docs/api_docs_page)  and dynamically 
 creates the functions.
 
-I initially created the client to automatically generate and write nordvpn wireguard configs to the router but then
-found an elegant way to autogenerate calls for the whole api. 
+The best way to navigate through the api is within an ipython shell. A wrapper is on the roadmap, but for now you must
+start ipython first and then load the module. Of course you can build your own application around, just bear in mind that
+the api function calls are generated on the fly.
 
-The best way to navigate through the api is within an ipython shell. I may add in future a wrapper but for now you must
-start the shell first and then load the module.
+My original use case was to automatically generate and write nordvpn wireguard configs to the router but then
+found an elegant way to autogenerate calls for the whole api and it got out of hand :). 
 
 ## Features
 - Complete API support
