@@ -6,6 +6,7 @@ class GlInetApiCall:
         self._session = session
         for name, value in data.items():
             setattr(self, name, self._wrap(value))
+        self.__doc__ = f"\nAvailable parameters (?=optional):\n" + self.__repr__() + f"\n\nExample request:\n{self.in_example}\n\n" + f"\n\nExample response:\n{self.out_example}\n"
 
     def _wrap(self, value):
         if isinstance(value, (tuple, list, set, frozenset)):
@@ -18,6 +19,7 @@ class GlInetApiCall:
 
     @decorators.login_required
     def __call__(self, params=None):
+
         p = []
         if params:
             p = list(params)
