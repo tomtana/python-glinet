@@ -1,5 +1,5 @@
 import time
-
+import os
 import requests
 import crypt
 import hashlib
@@ -12,6 +12,8 @@ import threading
 import warnings
 import utils
 import api_helper
+import pathlib
+import pickle
 
 
 class GlInet:
@@ -24,7 +26,9 @@ class GlInet:
                  keep_alive=True,
                  keep_alive_intervall=30,
                  verify_ssl_certificate=False,
-                 api_reference_url="https://dev.gl-inet.cn/docs/api_docs_api/"):
+                 update_api_reference_cache=False,
+                 api_reference_url="https://dev.gl-inet.cn/docs/api_docs_api/",
+                 cache_folder=None):
         """
         This class manages the connection to a GL-Inet router and provides basic routines to send and receive data.
 
@@ -37,19 +41,30 @@ class GlInet:
 
         :param url: url to router rpc api
         :param username: username, default is root.
-        :param password: password, if left empty, a prompt will ask you when login() is called
+        :param password: password, if left empty, a prompt will ask you when login() is called. For security reasons,
+        you should never pass your password here.
         :param protocol_version: default 2.0
         :param keep_alive: if set to True, a background thread will be started to keep the connection alive
         :param keep_alive_intervall: intervall in which the background thread sends requests to the router
         :param verify_ssl_certificate: either True/False or path to certificate.
+        :param update_api_reference_cache: if True, data is loaded from the web, otherwise application tries first to
+        load data from cache.
         :param api_reference_url: url to api description
+        :param cache_folder: folder where data is persisted. If left empty, default is $home/.python-glinet
         """
         self.url = url
         self.query_id = 0
-        if password is None:
-            self.password = getpass.getpass(prompt='Enter your GL-Inet password')
+        if cache_folder is None:
+            self._cache_folder = pathlib.Path.home()
+            self._cache_folder = os.path.join(self._cache_folder, ".python-glinet")
+            logging.info(f"Creating folder {self._cache_folder} if not exist")
+            pathlib.Path(self._cache_folder).mkdir(exist_ok=True)
         else:
-            self.password = password
+            if os.path.exists(cache_folder):
+                self._cache_folder = cache_folder
+            else:
+                raise FileNotFoundError(f"Path {cache_folder} doesnt exist.")
+        self._password = password
         self.username = username
         self.protocol_version = protocol_version
         self.session = requests.session()
@@ -62,8 +77,11 @@ class GlInet:
         if self._verify_ssl_certificate is False:
             logging.warning("You disabled ssl certificate validation. Further warning messages will be deactivated.")
             warnings.filterwarnings('ignore', message='Unverified HTTPS request')
+        self._cached_login_data = None
+        self._login_cache_path = os.path.join(self._cache_folder, "login.pkl")
+        self._api_reference_cache_path = os.path.join(self._cache_folder, "api_reference.pkl")
         self._api_reference_url = api_reference_url
-        self._api_desciption = self.__load_api_desciption()
+        self._api_desciption = self.__load_api_desciption(update_api_reference_cache)
 
     def __generate_query_id(self):
         """
@@ -165,16 +183,53 @@ class GlInet:
         :return: True
         """
         challenge = self.__challenge_login()
-        hash = self.__generate_hash(challenge)
-        resp = self.request("login", {"username": self.username,
-                                      "hash": hash})
-        self.sid = resp.result.sid
+        # try to load persisted login details
+        if self._cached_login_data is None and os.path.exists(self._login_cache_path):
+            with open(self._login_cache_path, "rb") as f:
+                try:
+                    loaded_data = pickle.load(f)
+                    if loaded_data:
+                        self._cached_login_data = loaded_data
+                except:
+                    logging.warning(f"Something went wrong loading file {self._login_cache_path}")
+        if ((self._cached_login_data is None and self._password is None) or
+                self._cached_login_data.get("username", None) != self.username or
+                self._cached_login_data.get("salt", None) != challenge.salt or
+                self._cached_login_data.get("alg") != challenge.alg):
+            self.__update_login_cache(challenge)
+
+        try:
+            #call challenge again since otherwise it will timeout
+            challenge = self.__challenge_login()
+            login_hash = self.__generate_login_hash(challenge)
+            resp = self.request("login", {"username": self.username,
+                                          "hash": login_hash})
+            self.sid = resp.result.sid
+        except exceptions.AccessDeniedError:
+            logging.warning("Could not login with current credentials, deleting cached credentials.")
+            self._cached_login_data = None
+            os.remove(self._login_cache_path)
+            raise
+
 
         # start keep alive thread
         if self._keep_alive:
             self._thread = threading.Thread(target=self.__keep_alive)
             self._thread.start()
         return True
+
+    def __update_login_cache(self, challenge):
+        self._password = getpass.getpass(prompt='Enter your GL-Inet password')
+        _hash = self.__generate_unix_passwd_hash(challenge.alg, challenge.salt)
+        login_data = {"username": self.username,
+                      "hash": _hash,
+                      "salt": challenge.salt,
+                      "alg": challenge.alg}
+        if login_data != self._cached_login_data:
+            self._cached_login_data = login_data
+            with open(self._login_cache_path, "wb") as f:
+                pickle.dump(self._cached_login_data, f)
+        self._password = None
 
     def __keep_alive(self):
         """
@@ -217,36 +272,50 @@ class GlInet:
         self.sid = None
         return True
 
-    def __generate_openssl_passwd(self, alg, salt):
+    def __generate_unix_passwd_hash(self, alg, salt):
         """
         Generate unix style hash with given algo and salt
         :param alg: algorithm
         :param salt: salt
         :return: hash
         """
-        return crypt.crypt(self.password, f"${alg}${salt}")
+        return crypt.crypt(self._password, f"${alg}${salt}")
 
-    def __generate_hash(self, challenge):
+    def __generate_login_hash(self, challenge):
         """
         Generate final authentication hash
         :param challenge: dict with nonce, salt and algo type
         :return: authentication hash
         """
-        openssl_pwd = self.__generate_openssl_passwd(challenge.alg, challenge.salt)
-        hash = hashlib.md5(f'{self.username}:{openssl_pwd}:{challenge.nonce}'.encode()).hexdigest()
-        return hash
+        return hashlib.md5(f'{self.username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()).hexdigest()
 
-    def __load_api_desciption(self):
+    def __load_api_desciption(self, update=False):
         """
-        Load api descipton in json format from docu page
+        Load api descipton in json format
+
+        @:param update: if true, the api description is loaded from the web. If false, the program first tries to load
+        the data from the cache.
         :return: api description
         """
-        logging.info(f"Loading api description from {self._api_reference_url}")
-        resp = requests.get(self._api_reference_url)
-        api = resp.json()["data"]
-        api = {utils.sanitize_string(i["module_name"][0]): i for i in api}
-        return api
+        api_description = None
+        if update or not os.path.exists(self._api_reference_cache_path):
+            logging.info(f"Loading api description from {self._api_reference_url}")
+            resp = requests.get(self._api_reference_url)
+            api_description = resp.json()["data"]
+            api_description = {utils.sanitize_string(i["module_name"][0]): i for i in api_description}
+            with open(self._api_reference_cache_path, "wb") as f:
+                logging.info(f"Updating cache file {self._api_reference_cache_path}")
+                pickle.dump(api_description, f)
+        else:
+            with open(self._api_reference_cache_path, "rb") as f:
+                api_description = pickle.load(f)
 
+        return api_description
+
+    def check_initialized(self):
+        self.request("call", "")
+
+    @decorators.login_required
     def get_api_client(self):
         """
         Create client to access api functions
