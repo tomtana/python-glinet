@@ -27,7 +27,7 @@ cd python-glinet
 ```
 
 Install package directly. The `-e` parameter lets you edit the files. 
-If this is not needed to can also install without the `e` parameter.
+If this is not needed to can also install without the `-e` parameter.
 ```
 pip install -e .
 ```
