@@ -54,9 +54,9 @@ Now you can intuitively navigate the api using code completion and docstring.
 
 
 ## Todos:
-- [ ] Add dynamically docstring for API calls
+- [x] Add dynamically docstring for API calls
+- [x] Create pip compliant package
 - [ ] Add tests
-- [ ] Create pip package
+- [ ] Publish pip package
 - [ ] Improve documentation
 - [ ] Add wrapper for execution via terminal
-- [ ] Improve repo structure

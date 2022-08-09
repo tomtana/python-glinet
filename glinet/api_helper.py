@@ -1,5 +1,5 @@
 from tabulate import tabulate
-import decorators
+import glinet.decorators as decorators
 
 class GlInetApiCall:
     def __init__(self, data, session):

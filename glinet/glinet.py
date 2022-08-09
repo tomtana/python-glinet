@@ -4,14 +4,14 @@ import requests
 import crypt
 import hashlib
 import getpass
-import exceptions
-import decorators
+import glinet.exceptions as exceptions
+import glinet.decorators as decorators
 import re
 import logging
 import threading
 import warnings
-from src.glinet import utils
-import api_helper
+from glinet import utils
+import glinet.api_helper as api_helper
 import pathlib
 import pickle
 

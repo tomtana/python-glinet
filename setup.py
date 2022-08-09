@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="python-glinet",
-    version="0.0.1",
+    version="0.1.0",
     author="Thomas Fontana",
     author_email="thomas@fontana.onl",
     description="This package gives client access to the Gl-Inet json-rpc for firmware >=4.0",
@@ -21,5 +21,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
-    install_requires=["ipython", "tabulate", "requests"]
+    install_requires=["ipython", "tabulate", "requests"],
+    packages=setuptools.find_packages()
 )
