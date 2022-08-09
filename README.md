@@ -55,6 +55,7 @@ Per default the following steps are executed:
 - start background thread to keep connectio alive
 
 ```python
+from pyglinet import GlInet
 glinet = GlInet()
 glinet.login()
 ```

@@ -1,5 +1,5 @@
 from functools import wraps
-import glinet.exceptions as exceptions
+import pyglinet.exceptions as exceptions
 
 
 def login_required(func):

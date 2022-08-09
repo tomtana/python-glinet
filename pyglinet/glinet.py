@@ -4,14 +4,14 @@ import requests
 import crypt
 import hashlib
 import getpass
-import glinet.exceptions as exceptions
-import glinet.decorators as decorators
+import pyglinet.exceptions as exceptions
+import pyglinet.decorators as decorators
 import re
 import logging
 import threading
 import warnings
-from glinet import utils
-import glinet.api_helper as api_helper
+from pyglinet import utils
+import pyglinet.api_helper as api_helper
 import pathlib
 import pickle
 
@@ -50,13 +50,13 @@ class GlInet:
         :param update_api_reference_cache: if True, data is loaded from the web, otherwise application tries first to
         load data from cache.
         :param api_reference_url: url to api description
-        :param cache_folder: folder where data is persisted. If left empty, default is $home/.python-glinet
+        :param cache_folder: folder where data is persisted. If left empty, default is $home/.python-pyglinet
         """
         self.url = url
         self.query_id = 0
         if cache_folder is None:
             self._cache_folder = pathlib.Path.home()
-            self._cache_folder = os.path.join(self._cache_folder, ".python-glinet")
+            self._cache_folder = os.path.join(self._cache_folder, ".python-pyglinet")
             logging.info(f"Creating folder {self._cache_folder} if not exist")
             pathlib.Path(self._cache_folder).mkdir(exist_ok=True)
         else:
