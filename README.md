@@ -78,7 +78,7 @@ Now you can intuitively navigate the api using code completion and docstring.
 ## ToDos:
 - [x] Add dynamically docstring for API calls
 - [x] Create pip compliant package
+- [x] Publish pip package
 - [ ] Add tests
-- [ ] Publish pip package
 - [ ] Improve documentation
 - [ ] Add wrapper for execution via terminal
