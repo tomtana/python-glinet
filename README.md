@@ -1,4 +1,4 @@
-# pyglinet - json-rpc client for GL-Inet Router
+# pyglinet - A Python 3 client for GL-Inet Router
 This package aims to provide full access to the GL-Inet Luci API for firmware versions >= 4.0 via json-rpc. 
 
 There is no official English documentation of the API yet. The lib parses the Chinese documentation from [here](https://dev.gl-inet.cn/docs/api_docs_page)  and dynamically 
