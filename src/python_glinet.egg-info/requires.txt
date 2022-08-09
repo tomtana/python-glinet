@@ -1,0 +1,3 @@
+ipython
+tabulate
+requests

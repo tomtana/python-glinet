@@ -291,10 +291,10 @@ class GlInet:
 
     def __load_api_desciption(self, update=False):
         """
-        Load api descipton in json format
+        Load api description in json format
 
         @:param update: if true, the api description is loaded from the web. If false, the program first tries to load
-        the data from the cache.
+        the data from the cache and in case this fails from the web.
         :return: api description
         """
         api_description = None
