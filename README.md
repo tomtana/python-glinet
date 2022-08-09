@@ -19,12 +19,26 @@ start the shell first and then load the module.
 
 
 ## Installation:
-clone repository
-```
-git clone https://github.com/tomtana/python-glinet.git
-```
-install package
 
+```
+#clone repository
+git clone https://github.com/tomtana/python-glinet.git
+cd python-glinet
+```
+
+Install package directly. The `-e` parameter lets you edit the files. 
+If this is not needed to can also install without the `e` parameter.
+```
+pip install -e .
+```
+
+Alternatively install it in an Python virtual environment (see [here](https://docs.python.org/3/tutorial/venv.html) 
+for more infos)
+```
+python3 -m venv venv
+source venv/bin/activate
+pip install -e .
+```
 ## Examples:
 
 ### Login
@@ -44,7 +58,7 @@ glinet = GlInet()
 glinet.login()
 ```
 
-### Api usage
+### API usage
 First you need to generate an api object.
 ```python
 client = glinet.get_api_client()
@@ -53,7 +67,7 @@ Now you can intuitively navigate the api using code completion and docstring.
 
 
 
-## Todos:
+## ToDos:
 - [x] Add dynamically docstring for API calls
 - [x] Create pip compliant package
 - [ ] Add tests
