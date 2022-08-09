@@ -4,3 +4,4 @@ __*/
 /python_glinet.egg-info/*
 /src/python_glinet.egg-info/
 /dist/
+/build/
