@@ -25,6 +25,25 @@ class GlInet:
                  keep_alive_intervall=30,
                  verify_ssl_certificate=False,
                  api_reference_url="https://dev.gl-inet.cn/docs/api_docs_api/"):
+        """
+        This class manages the connection to a GL-Inet router and provides basic routines to send and receive data.
+
+        Important: Only works with firmware version >=4.0. The api has changed from REST api to json-rpc with the 4.0,
+        so older firmware versions won't work.
+
+
+        The specific api calls are coordinated via the GlInetApi object,
+        which can be constructed via the get_api_client method.
+
+        :param url: url to router rpc api
+        :param username: username, default is root.
+        :param password: password, if left empty, a prompt will ask you when login() is called
+        :param protocol_version: default 2.0
+        :param keep_alive: if set to True, a background thread will be started to keep the connection alive
+        :param keep_alive_intervall: intervall in which the background thread sends requests to the router
+        :param verify_ssl_certificate: either True/False or path to certificate.
+        :param api_reference_url: url to api description
+        """
         self.url = url
         self.query_id = 0
         if password is None:
@@ -47,11 +66,21 @@ class GlInet:
         self._api_desciption = self.__load_api_desciption()
 
     def __generate_query_id(self):
+        """
+        Generate json-rpc query id
+        :return: query id
+        """
         qid = self.query_id
         self.query_id = (self.query_id + 1) % 9999999999
         return qid
 
     def __generate_request(self, method, params):
+        """
+        Generate json for rpc api call
+        :param method: rpc method
+        :param params: params
+        :return: json
+        """
         # if there was an successful login before
         if self.sid:
             if isinstance(params, dict):
@@ -79,6 +108,12 @@ class GlInet:
             }
 
     def request(self, method, params):
+        """
+        Send request to router
+        :param method: rpc method
+        :param params: parameter
+        :return: result
+        """
         req = self.__generate_request(method, params)
         self._lock.acquire()
         resp = self.session.post(self.url, json=req, verify=False)
@@ -96,7 +131,15 @@ class GlInet:
         return self.__create_object(resp.json(), method, params)
 
     def __create_object(self, json_data, method, params):
+        """
+        Create recursive object from json api response
 
+        Json data is stored in a convenience container, such that elements can be accessed as class attributes via '.'
+        :param json_data: json data
+        :param method: api method call
+        :param params: params
+        :return: ResultContainer
+        """
         if method == "call":
             typename = f"{params[0]}__{params[1]}"
             typename = re.sub(r"[,\-!/]", "_", typename)
@@ -105,10 +148,22 @@ class GlInet:
             return utils.ResultContainer(f"{method}", json_data)
 
     def __challenge_login(self):
+        """
+        Login challenge
+
+        Requests required information to start login process.
+        :return: challence
+        """
         resp = self.request("challenge", {"username": self.username})
         return resp.result
 
     def login(self):
+        """
+        Login
+
+        Login and start background thread for keep_alive is configured.
+        :return: True
+        """
         challenge = self.__challenge_login()
         hash = self.__generate_hash(challenge)
         resp = self.request("login", {"username": self.username,
@@ -122,6 +177,13 @@ class GlInet:
         return True
 
     def __keep_alive(self):
+        """
+        Keep connection alive
+
+        Function is started in background thread (see login() for more details). Send in fixed intervall requests to api.
+        If not successful, try to connect again.
+        :return: None
+        """
         logging.info(f"Starting keep alive thread at intvervall {self._keep_alive_intervall}")
         while self._keep_alive:
             logging.debug(f"keep alive with intervall {self._keep_alive_intervall}")
@@ -133,6 +195,10 @@ class GlInet:
 
     @decorators.login_required
     def is_alive(self):
+        """
+        Check if connection is alive.
+        :return: True if alive, else False
+        """
         if self.sid is None:
             return False
         try:
@@ -143,27 +209,49 @@ class GlInet:
 
     @decorators.login_required
     def logout(self):
+        """
+        Logout
+        :return: True
+        """
         self.request("logout", {"sid": self.sid})
         self.sid = None
         return True
 
     def __generate_openssl_passwd(self, alg, salt):
+        """
+        Generate unix style hash with given algo and salt
+        :param alg: algorithm
+        :param salt: salt
+        :return: hash
+        """
         return crypt.crypt(self.password, f"${alg}${salt}")
 
     def __generate_hash(self, challenge):
+        """
+        Generate final authentication hash
+        :param challenge: dict with nonce, salt and algo type
+        :return: authentication hash
+        """
         openssl_pwd = self.__generate_openssl_passwd(challenge.alg, challenge.salt)
         hash = hashlib.md5(f'{self.username}:{openssl_pwd}:{challenge.nonce}'.encode()).hexdigest()
         return hash
 
     def __load_api_desciption(self):
+        """
+        Load api descipton in json format from docu page
+        :return: api description
+        """
         logging.info(f"Loading api description from {self._api_reference_url}")
         resp = requests.get(self._api_reference_url)
         api = resp.json()["data"]
         api = {utils.sanitize_string(i["module_name"][0]): i for i in api}
         return api
 
-    @decorators.login_required
     def get_api_client(self):
+        """
+        Create client to access api functions
+        :return: api client
+        """
         return api_helper.GlInetApi(self._api_desciption, self)
 
 
