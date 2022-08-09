@@ -3,21 +3,18 @@ import time
 import requests
 import crypt
 import hashlib
-import os
 import getpass
 import exceptions
-from decorators import login_required
-from collections import namedtuple, OrderedDict
+import decorators
 import re
-import asyncio
 import logging
 import threading
 import warnings
 import utils
-from tabulate import tabulate
+import api_helper
 
 
-class GlInetBase:
+class GlInet:
 
     def __init__(self,
                  url="https://192.168.8.1/rpc",
@@ -103,9 +100,9 @@ class GlInetBase:
         if method == "call":
             typename = f"{params[0]}__{params[1]}"
             typename = re.sub(r"[,\-!/]", "_", typename)
-            return utils.create_recursive_object(json_data, typename)
+            return utils.ResultContainer(typename, json_data)
         else:
-            return utils.create_recursive_object(json_data, f"{method}")
+            return utils.ResultContainer(f"{method}", json_data)
 
     def __challenge_login(self):
         resp = self.request("challenge", {"username": self.username})
@@ -134,7 +131,7 @@ class GlInetBase:
             time.sleep(self._keep_alive_intervall)
         logging.info("Keep alive halted.")
 
-    @login_required
+    @decorators.login_required
     def is_alive(self):
         if self.sid is None:
             return False
@@ -144,7 +141,7 @@ class GlInetBase:
             return False
         return True
 
-    @login_required
+    @decorators.login_required
     def logout(self):
         self.request("logout", {"sid": self.sid})
         self.sid = None
@@ -165,63 +162,12 @@ class GlInetBase:
         api = {utils.sanitize_string(i["module_name"][0]): i for i in api}
         return api
 
+    @decorators.login_required
     def get_api_client(self):
-        return GlInetApi(self._api_desciption, self)
-
-
-class GlInetApiObject:
-    def __init__(self, data, session):
-        self._session = session
-        for name, value in data.items():
-            setattr(self, name, self._wrap(value))
-
-    def _wrap(self, value):
-        if isinstance(value, (tuple, list, set, frozenset)):
-            return type(value)([self._wrap(v) for v in value])
-        else:
-            return GlInetApi(value, self._session) if isinstance(value, dict) else value
-
-    def call(self):
-        self.__call__()
-
-    def __call__(self, params=None):
-        p = []
-        if params:
-            p = list(params)
-        p = self.module_name + [self.data.title] + p
-        return self._session.request("call", p)
-
-    def __repr__(self):
-        return tabulate([[i.keyName, i.dataType__name, i.desp] for i in self.params], headers=["Parameter", "Type", "Description"])
-
-    def __str__(self):
-        self.__repr__()
-
-
-class GlInetApi:
-    def __init__(self, data, session):
-        self._session = session
-        if data.get("case_groups_data", None):
-            for name, value in data.get("case_groups_data").items():
-                setattr(self, name, GlInetApiObject(value, self._session))
-        else:
-            for name, value in data.items():
-                setattr(self, name, self._wrap(value))
-
-    def _wrap(self, value):
-        if isinstance(value, (tuple, list, set, frozenset)):
-            return type(value)([self._wrap(v) for v in value])
-        else:
-            return GlInetApi(value, self._session) if isinstance(value, dict) else value
-
-    def __repr__(self):
-        return tabulate([[i] for i in list(self.__dict__.keys()) if not i.startswith("_")], headers=["Function"])
-
-    def __str__(self):
-        return str(self.__dict__)
+        return api_helper.GlInetApi(self._api_desciption, self)
 
 
 if __name__ == "__main__":
-    client = GlInetBase()
-    client.login()
-    api_client = client.get_api_client()
+    glinet = GlInet()
+    glinet.login()
+    api_client = glinet.get_api_client()
