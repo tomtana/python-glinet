@@ -90,7 +90,7 @@ client = glinet.get_api_client()
 - Due to python naming rules for variables, all "-" are replaced with "_" for the api method construction. **e.g. wg-client becomes wg_client.**
 - Use code completion and docstring to intuitively navigate the api
 
-#### Functional groups
+#### Functional Groups
 Just call your client to see all available api function groups.
 ```
 client
