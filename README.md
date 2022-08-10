@@ -17,7 +17,7 @@ The best way to navigate through the api is within an ipython shell. A wrapper f
 start ipython first and then load the module. 
 
 Of course, you can also build your own application around, just bear in mind that
-the api function calls are generated on the fly and therefore not available when writing your program. 
+the api function calls are generated on the fly and therefore are not available when writing your program. 
 
 
 
