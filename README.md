@@ -63,16 +63,7 @@ pip install -e .
 ## Getting Started
 
 ### Login
-Login is as easy as that. If you modified your ip-address or other parameter, 
-you need to pass them as parameter (see the documentation of the GlInet class for more details).
-
-Per default the following steps are executed:
-- if no password is passed
-  - try to load from persistance (password stored as hash)
-  - if no success ask via prompt
-- try to load api reference from persistence, otherwise load it from the web
-- persist settings
-- start background thread to keep connection alive
+Login is as easy as calling the `GlInet()` constructor. Only in case you modified the router default settings such as ip-address or username you need to pass them as parameter (see the documentation of the GlInet class for more details).
 
 Start ipython shell and make sure you sourced your venv if you use one.
 ```python
@@ -80,6 +71,13 @@ from pyglinet import GlInet
 glinet = GlInet()
 glinet.login()
 ```
+Per default the following steps are executed:
+- try to load api reference from persistence, otherwise load it from the web
+- if no password is passed
+  - try to load from persistance (password stored as hash)
+  - if no success ask via prompt
+- persist settings
+- start background thread to keep connection alive
 
 ### API Usage
 First generate an api object.
