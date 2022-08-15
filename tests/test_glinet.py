@@ -33,6 +33,7 @@ def test_successful_login_logout(glinet_base):
     with pytest.raises(exceptions.NotLoggedInError) as e:
         glinet_base.logout()
     assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
+    assert os.path.exists(glinet_base._api_reference_cache_path), "Api cache file was not created."
 
 @pytest.mark.vcr()
 def test_unsuccessful_login():
