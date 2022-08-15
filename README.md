@@ -1,4 +1,6 @@
-![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/tomtana/python-glinet/Python%20package)
+![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/tomtana/python-glinet/Python%20package) 
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/python-glinet)
+![PyPI](https://img.shields.io/pypi/v/python-glinet)
 
 # python-glinet - A Python3 Client for GL.Inet Router
 **This python client provides full access to the GL.Inet Luci API.**
@@ -253,6 +255,7 @@ The API json responses are recursively converted into objects. This provides con
 - [x] Add dynamically docstring for API calls
 - [x] Create pip compliant package
 - [x] Publish pip package
-- [ ] Add tests
+- [x] Add tests
+- [ ] Increase test coverage
 - [ ] Improve documentation
 - [ ] Add wrapper for execution via terminal
