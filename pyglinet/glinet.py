@@ -276,7 +276,7 @@ class GlInet:
             if not self.is_alive():
                 logging.warning("client disconnected, trying to login again..")
                 self.login()
-            time.sleep(self._keep_alive_intervall)
+            self._keep_alive_interrupt_event.wait(self._keep_alive_intervall)
         logging.info("Keep alive halted.")
 
     @decorators.login_required
