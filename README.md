@@ -1,7 +1,6 @@
-![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/tomtana/python-glinet/Python%20package) 
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/python-glinet)
-![PyPI](https://img.shields.io/pypi/v/python-glinet)
-
+[![GitHub Workflow Status (event)](https://img.shields.io/github/workflow/status/tomtana/python-glinet/Python%20package)](https://github.com/tomtana/python-glinet/actions/workflows/python-package.yml) 
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/python-glinet)](https://pypi.org/project/python-glinet)
+[![PyPI](https://img.shields.io/pypi/v/python-glinet)](https://pypi.org/project/python-glinet)
 # python-glinet - A Python3 Client for GL.Inet Router
 **This python client provides full access to the GL.Inet Luci API.**
 
