@@ -2,13 +2,19 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/python-glinet)](https://pypi.org/project/python-glinet)
 [![PyPI](https://img.shields.io/pypi/v/python-glinet)](https://pypi.org/project/python-glinet)
 # python-glinet - A Python3 Client for GL.Inet Router
-**This python client provides full access to the GL.Inet Luci API.**
+- **This python client provides full access to the GL.Inet Luci API.**
+- **Supported firmware versions: 4.0 onwards**
+- **Dynamic method creation including docstring from the gl.inet online documentation**
+- **Api responses are represented recursively as objects, such that you can access all properties via '.'**
+- **Cache for api description and hashed login**
+- **Configurable background thread to keep connection alive**
 
-**Supported firmware versions: 4.0 onwards**
-
+![](/ressources/python_glinet_demo.gif)
 ## About:
-My original use case was to automatically generate and write nordvpn wireguard configs to my slate axt-1800 router but then
-found an elegant way to autogenerate calls for the whole api and it got out of hand :).
+
+
+The original use case was to automatically generate and write nordvpn wireguard configs to my slate axt-1800 router, but then I
+found an elegant way to autogenerate methods for the whole api and `python-glinet` was born.
 
 It should be noted that GL.Inet changed the api mechanism from REST to JSON-RPC with the introduction of the firmware 4.0. Therefore, older
 versions are not supported.
@@ -16,22 +22,7 @@ versions are not supported.
 Also, there is no official documentation in English yet. The client parses the Chinese documentation from [here](https://dev.gl-inet.cn/docs/api_docs_page)  and dynamically 
 creates the api methods. Once it is available, the repo will be updated. 
 
-The best way to navigate through the api is within an ipython shell. A wrapper for ipython and terminal is on the roadmap, but for now you must
-start ipython first and then load the module. 
-
-Of course, you can also build your own application around, just bear in mind that
-the api function calls are generated on the fly and therefore are not available when writing your program. 
-
-
-
-## Features
-- Complete API support
-- Dynamic method creation inclusive docstring from online documentation
-- Api responses are represented recursively as objects, such that you can access all properties via '.'
-- Cache for api description and hashed login
-- Configure background thread to keep connection alive
-
-![](/ressources/python_glinet_demo.gif)
+The best way to navigate through the api is within an ipython shell, however, a wrapper for ipython and terminal is on the roadmap.
 
 ## Installation:
 
@@ -63,23 +54,25 @@ pip install -e .
 ## Getting Started
 
 ### Login
-Login is as easy as calling the `GlInet()` constructor. Only in case you modified the router default settings such as ip-address or username you need to pass them as parameter (see the documentation of the GlInet class for more details).
+Login is as easy as shown below. Only in case you modified the router default settings such as ip-address
+or username you need to pass them as parameter (see the documentation of the GlInet class for more details).
+The `login` method will ask you to input the password first time you call it.
 
-Start ipython shell and make sure you sourced your venv if you use one.
 ```python
 from pyglinet import GlInet
 glinet = GlInet()
 glinet.login()
 ```
-Per default the following steps are executed:
-- try to load api reference from persistence, otherwise load it from the web
-- if no password is passed
-  - try to load from persistance (password stored as hash)
-  - if no success ask via prompt
-- persist settings
-- start background thread to keep connection alive
+>**Info:**
+>With the default settings, the following tasks will be executed during init and login:
+>- try to load api reference from persistence, otherwise load it from the gl.inet online documentation
+>- if no password is passed as parameter in the constructor
+>  - try to load from persistence (password stored as hash)
+>  - if no success ask via prompt
+>- persist settings
+>- start background thread to keep connection alive
 
-### API Usage
+### API Access Via Dynamically Created Client
 First generate an api object.
 ```python
 client = glinet.get_api_client()
@@ -95,7 +88,8 @@ client = glinet.get_api_client()
 Just call your client to see all available api function groups.
 ```
 client
-
+```
+```bash
 Out[11]: 
 Function
 ------------------
@@ -147,7 +141,8 @@ cloud_batch_manage
 To explore the methods of a function group, just select it and hit enter.
 ```python
 client.wg_client
-
+```
+```bash
 Out[6]:
 Function
 --------------------
@@ -179,7 +174,8 @@ Select your method and press enter. A list for all possible parameters are print
 
 ```python
 api.wg_client.set_config
-
+```
+```bash
 Out[8]: 
 Parameter              Type    Description
 ---------------------  ------  ------------------
@@ -204,7 +200,8 @@ peer_id                number  配置ID
 You can also show the docstring by appending a `?` to the method. It will show all the parameter and usage examples.
 ```python
 api.wg_client.set_config?
-
+```
+```bash
 Signature: api.wg_client.set_config(params=None)
 Type:      GlInetApiCall
 File:      ~/.local/lib/python3.10/site-packages/pyglinet/api_helper.py
@@ -236,23 +233,56 @@ Example response:
 {\"jsonrpc\": \"2.0\", \"id\": 1, \"result\": {}}
 ```
 
+
 #### Method call
 Just call the method as usual. Check the usage examples to understand how parameters need to be passed.
 
 ```
 client.wg_client.get_all_config_list()
-
+```
+```bash
 Out[12]: {'name': 'wg_client__get_all_config_list', 'config_list': [{'name': 'wg_client__get_all_config_list', 'username': '', 'group_name': 'AzireVPN', 'peers': [], 'password': '', 'auth_type': 1, 'group_id': 9690}]}
 ```
 
 #### API Response Processing
 The API json responses are recursively converted into objects. This provides convenient access with code completion and point access to the data.
 
-## ToDos:
+### API Access Via Manual Requests
+Instead of using the dynamically created api_client, it is also possible to use the `GlInet` instance to make api requests.
+In fact, the api_client uses the same mechanism.
+
+Once logged in, you simply can use the `glinet.request(method, params)` method to access or retrieve data from the api.
+Information about the method and the parameters can either be found in the [documentation](https://dev.gl-inet.cn/docs/api_docs_page) or via the api_client.
+
+e.g.
+```
+glinet.request("call", ["adguardhome", "get_config"])
+```
+```bash
+Out[12]: {'name': 'adguardhome__get_config', 'id': 13, 'jsonrpc': '2.0', 'result': {'name': 'adguardhome__get_config', 'enabled': False}}
+```
+
+is equivalent to
+```
+api_client.adguardhome.get_config()
+```
+```bash
+Out[13]: {'name': 'adguardhome__get_config', 'enabled': False}
+```
+
+>**Note:** the output of the `request` method returns the whole response body whereas the api_client just returns the result. 
+
+
+
+## Roadmap:
+### V1.0.0
 - [x] Add dynamically docstring for API calls
 - [x] Create pip compliant package
 - [x] Publish pip package
 - [x] Add tests
+- [x] Improve documentation
 - [ ] Increase test coverage
-- [ ] Improve documentation
+
+### V2.0.0
 - [ ] Add wrapper for execution via terminal
+- [ ] ...
