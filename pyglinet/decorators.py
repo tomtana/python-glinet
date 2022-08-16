@@ -26,9 +26,9 @@ def logout_required(func):
 
 def has_sid(func):
     try:
-        if func.sid is None:
+        if func._sid is None:
             return False
     except AttributeError:
-        if func._session.sid is None:
+        if func._session._sid is None:
             return False
     return True
