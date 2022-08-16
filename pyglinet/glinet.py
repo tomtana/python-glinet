@@ -17,7 +17,30 @@ import pickle
 
 
 class GlInet:
+    """
+    This class manages the connection to a GL-Inet router and provides basic routines to send and receive data.
 
+    Important: Only works with firmware version >=4.0. The api has changed from REST api to json-rpc with the 4.0,
+    so older firmware versions won't work.
+
+    Before you can start making requests, you need to call the :meth:`~pyglinet.GlInet.login` method
+
+    The api calls can either be made via the GlInetApi object,
+    which can be constructed via the get_api_client method, or via the request method directly.
+
+    :param url: url to router rpc api
+    :param username: username, default is root.
+    :param password: password, if left empty, a prompt will ask you when login() is called. For security reasons,
+        you should never pass your password here.
+    :param protocol_version: default 2.0
+    :param keep_alive: if set to True, a background thread will be started to keep the connection alive
+    :param keep_alive_intervall: intervall in which the background thread sends requests to the router
+    :param verify_ssl_certificate: either True/False or path to certificate.
+    :param update_api_reference_cache: if True, data is loaded from the web, otherwise application tries first to
+        load data from cache.
+    :param api_reference_url: url to api description
+    :param cache_folder: folder where data is persisted. If left empty, default is `$home/.python-pyglinet`
+    """
     def __init__(self,
                  url="https://192.168.8.1/rpc",
                  username="root",
@@ -29,31 +52,8 @@ class GlInet:
                  update_api_reference_cache=False,
                  api_reference_url="https://dev.gl-inet.cn/docs/api_docs_api/",
                  cache_folder=None):
-        """
-        This class manages the connection to a GL-Inet router and provides basic routines to send and receive data.
-
-        Important: Only works with firmware version >=4.0. The api has changed from REST api to json-rpc with the 4.0,
-        so older firmware versions won't work.
-
-
-        The specific api calls are coordinated via the GlInetApi object,
-        which can be constructed via the get_api_client method.
-
-        :param url: url to router rpc api
-        :param username: username, default is root.
-        :param password: password, if left empty, a prompt will ask you when login() is called. For security reasons,
-        you should never pass your password here.
-        :param protocol_version: default 2.0
-        :param keep_alive: if set to True, a background thread will be started to keep the connection alive
-        :param keep_alive_intervall: intervall in which the background thread sends requests to the router
-        :param verify_ssl_certificate: either True/False or path to certificate.
-        :param update_api_reference_cache: if True, data is loaded from the web, otherwise application tries first to
-        load data from cache.
-        :param api_reference_url: url to api description
-        :param cache_folder: folder where data is persisted. If left empty, default is $home/.python-pyglinet
-        """
-        self.url = url
-        self.query_id = 0
+        self._url = url
+        self._query_id = 0
         if cache_folder is None:
             self._cache_folder = pathlib.Path.home()
             self._cache_folder = os.path.join(self._cache_folder, ".python-pyglinet")
@@ -65,10 +65,10 @@ class GlInet:
             else:
                 raise FileNotFoundError(f"Path {cache_folder} doesnt exist.")
         self._password = password
-        self.username = username
-        self.protocol_version = protocol_version
-        self.session = requests.session()
-        self.sid = None
+        self._username = username
+        self._protocol_version = protocol_version
+        self._session = requests.session()
+        self._sid = None
         self._keep_alive = keep_alive
         self._keep_alive_intervall = keep_alive_intervall
         self._thread = None
@@ -89,8 +89,8 @@ class GlInet:
         Generate json-rpc query id
         :return: query id
         """
-        qid = self.query_id
-        self.query_id = (self.query_id + 1) % 9999999999
+        qid = self._query_id
+        self._query_id = (self._query_id + 1) % 9999999999
         return qid
 
     def __generate_request(self, method, params):
@@ -101,26 +101,26 @@ class GlInet:
         :return: json
         """
         # if there was an successful login before
-        if self.sid:
+        if self._sid:
             if isinstance(params, dict):
-                params_ = {"sid": self.sid}
+                params_ = {"sid": self._sid}
                 params_.update(params)
                 return {
-                    "jsonrpc": self.protocol_version,
+                    "jsonrpc": self._protocol_version,
                     "id": self.__generate_query_id(),
                     "method": method,
                     "params": params_
                 }
             else:
                 return {
-                    "jsonrpc": self.protocol_version,
+                    "jsonrpc": self._protocol_version,
                     "id": self.__generate_query_id(),
                     "method": method,
-                    "params": [self.sid] + list(params)
+                    "params": [self._sid] + list(params)
                 }
         else:
             return {
-                "jsonrpc": self.protocol_version,
+                "jsonrpc": self._protocol_version,
                 "id": self.__generate_query_id(),
                 "method": method,
                 "params": params
@@ -135,7 +135,7 @@ class GlInet:
         """
         req = self.__generate_request(method, params)
         self._lock.acquire()
-        resp = self.session.post(self.url, json=req, verify=False)
+        resp = self._session.post(self._url, json=req, verify=False)
         self._lock.release()
         if resp.json().get("error", None):
             error_ = resp.json().get("error")
@@ -173,7 +173,7 @@ class GlInet:
         Requests required information to start login process.
         :return: challence
         """
-        resp = self.request("challenge", {"username": self.username})
+        resp = self.request("challenge", {"username": self._username})
         return resp.result
 
     @decorators.logout_required
@@ -181,8 +181,10 @@ class GlInet:
         """
         Login
 
-        Login and start background thread for keep_alive is configured. If password was set,
-        cached values will be ignored.
+        Login and start background thread for keep_alive is configured. If password was set in constructor,
+        cached values will be ignored. If password was not set (default) in :meth:`~pyglinet.GlInet`, you will be asked to enter the password
+        the first time this function is called. If login was successful, the password hash is cashed.
+
         :return: True
         """
         challenge = self.__challenge_login()
@@ -197,9 +199,9 @@ class GlInet:
             # call challenge again since otherwise it will timeout
             challenge = self.__challenge_login()
             login_hash = self.__generate_login_hash(challenge)
-            resp = self.request("login", {"username": self.username,
+            resp = self.request("login", {"username": self._username,
                                           "hash": login_hash})
-            self.sid = resp.result.sid
+            self._sid = resp.result._sid
         except exceptions.AccessDeniedError:
             logging.warning("Could not login with current credentials, deleting cached credentials.")
             self._cached_login_data = None
@@ -230,7 +232,7 @@ class GlInet:
             password = getpass.getpass(prompt='Enter your GL-Inet password')
 
         _hash = self.__generate_unix_passwd_hash(password, challenge.alg, challenge.salt)
-        login_data = {"username": self.username,
+        login_data = {"username": self._username,
                       "hash": _hash,
                       "salt": challenge.salt,
                       "alg": challenge.alg}
@@ -242,7 +244,7 @@ class GlInet:
         """
         Load pickle file if it exists.
         :param file: path to file
-        :return: None if file doesnt exist, else Data
+        :return: None if file doesn't exist, else Data
         """
         loaded_data = None
         if os.path.exists(file):
@@ -283,12 +285,13 @@ class GlInet:
     def is_alive(self):
         """
         Check if connection is alive.
+
         :return: True if alive, else False
         """
-        if self.sid is None:
+        if self._sid is None:
             return False
         try:
-            resp = self.request("alive", {"sid": self.sid})
+            resp = self.request("alive", {"sid": self._sid})
         except exceptions.AccessDeniedError:
             return False
         return True
@@ -297,10 +300,11 @@ class GlInet:
     def logout(self):
         """
         Logout and stop keep alive thread
+
         :return: True
         """
-        self.request("logout", {"sid": self.sid})
-        self.sid = None
+        self.request("logout", {"sid": self._sid})
+        self._sid = None
         self._stop_keep_alive_thread()
         return True
 
@@ -319,7 +323,7 @@ class GlInet:
         :param challenge: dict with nonce, salt and algo type
         :return: authentication hash
         """
-        return hashlib.md5(f'{self.username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()).hexdigest()
+        return hashlib.md5(f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()).hexdigest()
 
     def __load_api_desciption(self, update=False):
         """
@@ -351,6 +355,7 @@ class GlInet:
     def get_api_client(self):
         """
         Create client to access api functions
+
         :return: api client
         """
         return api_helper.GlInetApi(self._api_desciption, self)
