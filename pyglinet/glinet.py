@@ -201,7 +201,7 @@ class GlInet:
             login_hash = self.__generate_login_hash(challenge)
             resp = self.request("login", {"username": self._username,
                                           "hash": login_hash})
-            self._sid = resp.result._sid
+            self._sid = resp.result.sid
         except exceptions.AccessDeniedError:
             logging.warning("Could not login with current credentials, deleting cached credentials.")
             self._cached_login_data = None
