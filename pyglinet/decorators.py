@@ -11,6 +11,7 @@ def login_required(func):
 
     return inner_func
 
+
 def logout_required(func):
     @wraps(func)
     def inner_func(self, *args, **kwargs):
@@ -23,6 +24,7 @@ def logout_required(func):
         return func(self, *args, **kwargs)
 
     return inner_func
+
 
 def has_sid(func):
     try:

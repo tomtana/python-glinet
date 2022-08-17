@@ -14,7 +14,7 @@ python-glinet - A Python3 Client for GL.Inet Router
 -  **Cache for api description and hashed login**
 -  **Configurable background thread to keep connection alive**
 
-|image3|
+.. image:: ressources/python_glinet_demo.gif
 
 About:
 ------
@@ -33,8 +33,7 @@ parses the Chinese documentation from
 `here <https://dev.gl-inet.cn/docs/api_docs_page>`__ and dynamically
 creates the api methods. Once it is available, the repo will be updated.
 
-The best way to navigate through the api is within an ipython shell,
-however, a wrapper for ipython and terminal is on the roadmap.
+The best way to navigate and explore the api is within an ipython shell. A wrapper for ipython and terminal is on the `roadmap`_.
 
 Installation:
 -------------
@@ -42,14 +41,14 @@ Installation:
 PiP
 ~~~
 
-::
+.. code-block:: sh
 
    pip install python-glinet
 
 From Repo
 ~~~~~~~~~
 
-::
+.. code-block:: sh
 
    #clone repository
    git clone https://github.com/tomtana/python-glinet.git
@@ -58,14 +57,14 @@ From Repo
 Install package directly. The ``-e`` parameter lets you edit the files.
 If this is not needed to can also install without the ``-e`` parameter.
 
-::
+.. code-block:: sh
 
    pip install -e .
 
 Alternatively install it in an Python virtual environment (see
 `here <https://docs.python.org/3/tutorial/venv.html>`__ for more infos)
 
-::
+.. code-block:: sh
 
    python3 -m venv venv
    source venv/bin/activate
@@ -256,7 +255,7 @@ Docstring
 You can also show the docstring by appending a ``?`` to the method. It
 will show all the parameter and usage examples.
 
-.. code:: python
+.. code:: ipython
 
    api.wg_client.set_config?
 
@@ -352,6 +351,9 @@ is equivalent to
    **Note:** the output of the ``request`` method returns the whole
    response body whereas the api_client just returns the result.
 
+
+.. _roadmap:
+
 Roadmap:
 --------
 
@@ -381,4 +383,3 @@ V2.0.0
    :target: https://pypi.org/project/python-glinet
 .. |PyPI| image:: https://img.shields.io/pypi/v/python-glinet
    :target: https://pypi.org/project/python-glinet
-.. |image3| image:: /ressources/python_glinet_demo.gif
