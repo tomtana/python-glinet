@@ -14,6 +14,7 @@ from pyglinet import utils
 import pyglinet.glinet_api as api_helper
 import pathlib
 import pickle
+from typing import Union, List, Dict
 
 
 class GlInet:
@@ -41,17 +42,18 @@ class GlInet:
     :param api_reference_url: url to api description
     :param cache_folder: folder where data is persisted. If left empty, default is `$home/.python-pyglinet`
     """
+
     def __init__(self,
-                 url="https://192.168.8.1/rpc",
-                 username="root",
-                 password=None,
-                 protocol_version="2.0",
-                 keep_alive=True,
-                 keep_alive_intervall=30,
-                 verify_ssl_certificate=False,
-                 update_api_reference_cache=False,
-                 api_reference_url="https://dev.gl-inet.cn/docs/api_docs_api/",
-                 cache_folder=None):
+                 url: str = "https://192.168.8.1/rpc",
+                 username: str = "root",
+                 password: Union[str, None] = None,
+                 protocol_version: str = "2.0",
+                 keep_alive: bool = True,
+                 keep_alive_intervall: float = 30,
+                 verify_ssl_certificate: bool = False,
+                 update_api_reference_cache: bool = False,
+                 api_reference_url: str = "https://dev.gl-inet.cn/docs/api_docs_api/",
+                 cache_folder: bool = None):
         self._url = url
         self._query_id = 0
         if cache_folder is None:
@@ -84,7 +86,7 @@ class GlInet:
         self._api_desciption = self.__load_api_desciption(update_api_reference_cache)
         self._keep_alive_interrupt_event = threading.Event()
 
-    def __generate_query_id(self):
+    def __generate_query_id(self) -> int:
         """
         Generate json-rpc query id
         :return: query id
@@ -93,7 +95,7 @@ class GlInet:
         self._query_id = (self._query_id + 1) % 9999999999
         return qid
 
-    def __generate_request(self, method, params):
+    def __generate_request(self, method: str, params: Union[Dict, List[str], str]) -> dict:
         """
         Generate json for rpc api call
         :param method: rpc method
@@ -126,11 +128,12 @@ class GlInet:
                 "params": params
             }
 
-    def request(self, method, params):
+    def request(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
         """
         Send request to router
         :param method: rpc method
         :param params: parameter
+
         :return: result
         """
         req = self.__generate_request(method, params)
@@ -157,6 +160,7 @@ class GlInet:
         :param json_data: json data
         :param method: api method call
         :param params: params
+
         :return: ResultContainer
         """
         if method == "call":
@@ -179,8 +183,6 @@ class GlInet:
     @decorators.logout_required
     def login(self):
         """
-        Login
-
         Login and start background thread for keep_alive is configured. If password was set in constructor,
         cached values will be ignored. If password was not set (default) in :meth:`~pyglinet.GlInet`, you will be asked to enter the password
         the first time this function is called. If login was successful, the password hash is cashed.
@@ -240,10 +242,11 @@ class GlInet:
             self._cached_login_data = login_data
             self.__dump_to_file(self._cached_login_data, self._login_cache_path)
 
-    def __load_if_exist(self, file):
+    def __load_if_exist(self, file: str):
         """
         Load pickle file if it exists.
         :param file: path to file
+
         :return: None if file doesn't exist, else Data
         """
         loaded_data = None
@@ -258,18 +261,21 @@ class GlInet:
     def __dump_to_file(self, obj, file):
         """
         Dump pickle data to file.
+        :param obj: object to dump
         :param file: path to file
+
         :return: None
         """
         with open(file, "wb") as f:
             pickle.dump(obj, f)
 
-    def __keep_alive(self):
+    def __keep_alive(self) -> None:
         """
         Keep connection alive
 
         Function is started in background thread (see login() for more details). Send in fixed intervall requests to api.
         If not successful, try to connect again.
+
         :return: None
         """
         logging.info(f"Starting keep alive thread at intvervall {self._keep_alive_intervall}")
@@ -282,7 +288,7 @@ class GlInet:
         logging.info("Keep alive halted.")
 
     @decorators.login_required
-    def is_alive(self):
+    def is_alive(self) -> bool:
         """
         Check if connection is alive.
 
@@ -297,7 +303,7 @@ class GlInet:
         return True
 
     @decorators.login_required
-    def logout(self):
+    def logout(self) -> bool:
         """
         Logout and stop keep alive thread
 
@@ -308,11 +314,12 @@ class GlInet:
         self._stop_keep_alive_thread()
         return True
 
-    def __generate_unix_passwd_hash(self, password, alg, salt):
+    def __generate_unix_passwd_hash(self, password: str, alg: str, salt: str) -> str:
         """
         Generate unix style hash with given algo and salt
         :param alg: algorithm
         :param salt: salt
+
         :return: hash
         """
         return crypt.crypt(password, f"${alg}${salt}")
@@ -321,16 +328,18 @@ class GlInet:
         """
         Generate final authentication hash
         :param challenge: dict with nonce, salt and algo type
+
         :return: authentication hash
         """
         return hashlib.md5(f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()).hexdigest()
 
-    def __load_api_desciption(self, update=False):
+    def __load_api_desciption(self, update: bool = False):
         """
         Load api description in json format
 
         @:param update: if true, the api description is loaded from the web. If false, the program first tries to load
         the data from the cache and in case this fails from the web.
+
         :return: api description
         """
         api_description = None
@@ -352,16 +361,10 @@ class GlInet:
         self.request("call", "")
 
     @decorators.login_required
-    def get_api_client(self):
+    def get_api_client(self) -> api_helper.GlInetApi:
         """
-        Create client to access api functions
+        Create GlInetApi object client to access api functions
 
         :return: api client
         """
         return api_helper.GlInetApi(self._api_desciption, self)
-
-
-if __name__ == "__main__":
-    glinet = GlInet()
-    glinet.login()
-    api_client = glinet.get_api_client()
