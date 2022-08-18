@@ -359,7 +359,6 @@ is equivalent to
 Roadmap
 -------
 
-.. _v100:
 
 V1.0.0
 ~~~~~~
@@ -371,7 +370,6 @@ V1.0.0
 -  ☒ Improve documentation
 -  ☐ Increase test coverage
 
-.. _v200:
 
 V2.0.0
 ~~~~~~
