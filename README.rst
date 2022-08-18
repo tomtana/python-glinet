@@ -259,11 +259,11 @@ Docstring
 You can also show the docstring by appending a ``?`` to the method. It
 will show all the parameter and usage examples.
 
-.. code::
+.. code:: text
 
    api.wg_client.set_config?
 
-.. code:: bash
+.. code:: text
 
    Signature: api.wg_client.set_config(params=None)
    Type:      GlInetApiCall
