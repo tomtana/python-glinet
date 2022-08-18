@@ -8,12 +8,12 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="python-glinet",
-    version="0.3.13",
+    version="0.3.14",
     author="Thomas Fontana",
     author_email="python@fontana.onl",
-    description="This package gives client access to the Gl-Inet json-rpc for firmware >=4.0",
+    description="Python3 client for Gl.Inet LUCI API with firmware >=4.0",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     url="https://github.com/tomtana/python-glinet",
     project_urls={
         "Bug Tracker": "https://github.com/tomtana/python-glinet/issues",
