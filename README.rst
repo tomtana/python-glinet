@@ -17,7 +17,7 @@ python-glinet - A Python3 Client for GL.Inet Router
 -  **Cache for api description and hashed login**
 -  **Configurable background thread to keep connection alive**
 
-.. image:: /ressources/python_glinet_demo.gif
+.. image:: https://github.com/tomtana/python-glinet/raw/main/ressources/python_glinet_demo.gif
 
 About
 ------
