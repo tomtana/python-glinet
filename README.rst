@@ -5,8 +5,6 @@
 .. image:: https://img.shields.io/pypi/v/python-glinet
    :target: https://pypi.org/project/python-glinet
 
-.. _python-glinet---a-python3-client-for-glinet-router:
-
 python-glinet - A Python3 Client for GL.Inet Router
 ===================================================
 
