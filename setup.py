@@ -17,6 +17,7 @@ setuptools.setup(
     url="https://github.com/tomtana/python-glinet",
     project_urls={
         "Bug Tracker": "https://github.com/tomtana/python-glinet/issues",
+        "Documentation": "https://tomtana.github.io/python-glinet"
     },
     classifiers=[
         "Programming Language :: Python :: 3",
