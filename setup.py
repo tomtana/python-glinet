@@ -8,7 +8,7 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="python-glinet",
-    version="0.3.7",
+    version="0.3.8",
     author="Thomas Fontana",
     author_email="python@fontana.onl",
     description="This package gives client access to the Gl-Inet json-rpc for firmware >=4.0",

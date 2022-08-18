@@ -259,7 +259,7 @@ Docstring
 You can also show the docstring by appending a ``?`` to the method. It
 will show all the parameter and usage examples.
 
-.. code:: python
+.. code::
 
    api.wg_client.set_config?
 
