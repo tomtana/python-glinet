@@ -16,7 +16,7 @@ python-glinet - A Python3 Client for GL.Inet Router
 
 .. image:: /ressources/python_glinet_demo.gif
 
-About:
+About
 ------
 
 The original use case was to automatically generate and write nordvpn
@@ -35,7 +35,7 @@ creates the api methods. Once it is available, the repo will be updated.
 
 The best way to navigate and explore the api is within an ipython shell. A wrapper for ipython and terminal is on the `roadmap`_.
 
-Installation:
+Installation
 -------------
 
 PiP
@@ -255,7 +255,7 @@ Docstring
 You can also show the docstring by appending a ``?`` to the method. It
 will show all the parameter and usage examples.
 
-.. code:: ipython
+.. code:: python
 
    api.wg_client.set_config?
 
@@ -354,8 +354,8 @@ is equivalent to
 
 .. _roadmap:
 
-Roadmap:
---------
+Roadmap
+-------
 
 .. _v100:
 
