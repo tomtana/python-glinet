@@ -39,7 +39,7 @@ parses the Chinese documentation from
 creates the api methods. Once it is available, the repo will be updated.
 
 The best way to navigate and explore the api is within an ipython shell.
-A wrapper for ipython and terminal is on the `roadmap`_.
+A wrapper for ipython and terminal is on the roadmap.
 
 Installation
 -------------
@@ -357,8 +357,6 @@ is equivalent to
    **Note:** the output of the ``request`` method returns the whole
    response body whereas the api_client just returns the result.
 
-
-.. _roadmap:
 
 Roadmap
 -------
