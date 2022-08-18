@@ -34,6 +34,7 @@ jobs:
       run: |
         docker run --rm --volume "$(pwd):/data" --user $(id -u):$(id -g) pandoc/core README.rst -o README.md
         rm README.rst
+        mv README.md README.rst
     - name: Build package
       run: python -m build
     - name: Publish package
