@@ -33,7 +33,8 @@ parses the Chinese documentation from
 `here <https://dev.gl-inet.cn/docs/api_docs_page>`__ and dynamically
 creates the api methods. Once it is available, the repo will be updated.
 
-The best way to navigate and explore the api is within an ipython shell. A wrapper for ipython and terminal is on the `roadmap`_.
+The best way to navigate and explore the api is within an ipython shell.
+A wrapper for ipython and terminal is on the `roadmap`_.
 
 Installation
 -------------
