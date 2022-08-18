@@ -1,9 +1,5 @@
-.. image:: https://img.shields.io/github/workflow/status/tomtana/python-glinet/Python%20package
-   :target: https://github.com/tomtana/python-glinet/actions/workflows/python-package.yml
-.. image:: https://img.shields.io/pypi/pyversions/python-glinet
-   :target: https://pypi.org/project/python-glinet
-.. image:: https://img.shields.io/pypi/v/python-glinet
-   :target: https://pypi.org/project/python-glinet
+|GitHub Workflow Status (event)| |PyPI - Python Version| |PyPI|
+
 
 python-glinet - A Python3 Client for GL.Inet Router
 ===================================================
@@ -377,4 +373,10 @@ V2.0.0
 -  ☐ Add wrapper for execution via terminal
 -  ☐ ...
 
-
+.. |GitHub Workflow Status (event)| image:: https://img.shields.io/github/workflow/status/tomtana/python-glinet/Python%20package
+   :target: https://github.com/tomtana/python-glinet/actions/workflows/python-package.yml
+.. |PyPI - Python Version| image:: https://img.shields.io/pypi/pyversions/python-glinet
+   :target: https://pypi.org/project/python-glinet
+.. |PyPI| image:: https://img.shields.io/pypi/v/python-glinet
+   :target: https://pypi.org/project/python-glinet
+.. |image3| image:: /ressources/python_glinet_demo.gif
