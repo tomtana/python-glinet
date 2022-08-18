@@ -39,6 +39,8 @@ jobs:
         with:
           # Upload entire repository
           path: 'docs/_build/html'
+      - name: Move ressources to html folder
+        run: cp -r /ressources /docs/_build/html
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
