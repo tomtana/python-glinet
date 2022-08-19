@@ -7,8 +7,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'python-glinet'
-copyright = '2022, Thomas Fontana'
-author = 'Thomas Fontana'
+copyright = '2022, Tomtana'
+author = 'Tomtana'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -9,9 +9,9 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="python-glinet",
     version="0.4.0",
-    author="Thomas Fontana",
-    author_email="python@fontana.onl",
-    description="Python3 client for Gl.Inet LUCI API with firmware >=4.0",
+    author="Tomtana",
+    author_email="python@tomtana.net",
+    description="Python3 client for Gl.Inet LUCI API firmware 4.0 onwards.",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/tomtana/python-glinet",
