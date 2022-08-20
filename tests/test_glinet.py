@@ -28,7 +28,7 @@ def glinet(glinet_base):
     return glinet_base
 
 
-# @pytest.mark.vcr()
+@pytest.mark.vcr()
 def test_login_logout_caching(glinet_base):
     assert glinet_base.login(), "Login was not successful"
 
@@ -43,7 +43,7 @@ def test_login_logout_caching(glinet_base):
     assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
     assert os.path.exists(glinet_base._api_reference_cache_path), "Api cache file was not created."
 
-
+@pytest.mark.vcr()
 def test_keep_alive(glinet_base):
     assert glinet_base.login(), "Login was not successful"
     assert glinet_base.is_alive(), "Not logged in"
@@ -64,7 +64,7 @@ def test_keep_alive(glinet_base):
     assert not glinet_base._thread.is_alive(), "Keep alive thread still running"
 
 
-# @pytest.mark.vcr()
+@pytest.mark.vcr()
 def test_unsuccessful_login():
     glinet_test = GlInet(password="wrong_password")
     with pytest.raises(exceptions.AccessDeniedError) as e:
@@ -78,7 +78,7 @@ def test_unsuccessful_login():
         glinet_test.request("call", ["led", "get-config"])
 
 
-# @pytest.mark.vcr()
+@pytest.mark.vcr()
 def test_api_client_01(glinet):
     api_client = glinet.get_api_client()
     # check if request and api client have same behaviour
@@ -92,7 +92,7 @@ def test_api_client_01(glinet):
     api_client.led.set_config([{"led_enable": True}])
     assert api_client.led.get_config().led_enable, "Value has not been set"
 
-
+@pytest.mark.vcr()
 def test_requests(glinet_base):
     glinet_base.login()
     with(pytest.raises(exceptions.LoggedInError)):
