@@ -83,8 +83,11 @@ class GlInet:
         self._login_cache_path = os.path.join(self._cache_folder, "login.pkl")
         self._api_reference_cache_path = os.path.join(self._cache_folder, "api_reference.pkl")
         self._api_reference_url = api_reference_url
-        self._api_desciption = self.__load_api_desciption(update_api_reference_cache)
+        self._api_desciption = self.__load_api_description(update_api_reference_cache)
         self._keep_alive_interrupt_event = threading.Event()
+
+    def __del__(self):
+        self._stop_keep_alive_thread()
 
     def __generate_query_id(self) -> int:
         """
@@ -128,13 +131,13 @@ class GlInet:
                 "params": params
             }
 
-    def request(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
+    def __request(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
         """
-        Send request to router
+        Send request to router without considering the current login state. This may lead to misleading error messages.
         :param method: rpc method
         :param params: parameter
 
-        :return: result
+        :return: ResultContainer
         """
         req = self.__generate_request(method, params)
         self._lock.acquire()
@@ -144,6 +147,10 @@ class GlInet:
             error_ = resp.json().get("error")
             if error_["code"] == -32000:
                 raise exceptions.AccessDeniedError(f"Access denied, error output: {error_}")
+            elif error_["code"] == -32602:
+                raise exceptions.WrongParametersError(f"Wrong params in request, error output: {error_}")
+            elif error_["code"] == -32601:
+                raise exceptions.MethodNotFoundError(f"Wrong method {req.get('method', None)} in request, error output: {error_}")
             else:
                 raise ConnectionError(resp.json())
         if resp.status_code != 200:
@@ -151,6 +158,44 @@ class GlInet:
         if resp.json().get("result", None) and resp.json().get("result", None).get("err_msg", None):
             raise ConnectionError(resp.json())
         return self.__create_object(resp.json(), method, params)
+
+    @decorators.login_required
+    def __request_with_sid(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
+        """
+        Request which requires prior login
+        :param method: api method call
+        :param params: params
+
+        :return: ResultContainer
+        """
+        return self.__request(method, params)
+
+    @decorators.logout_required
+    def __request_without_sid(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
+        """
+        Request which requires to be logged out
+        :param method: api method call
+        :param params: params
+
+        :return: ResultContainer
+        """
+        return self.__request(method, params)
+
+    def request(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
+        """
+        Send request. Function checks if method requires login and chooses the respective request wrapper.
+        see :meth:`~pyglinet.GlInet.__request_with_sid` and :meth:`~pyglinet.GlInet._request`
+        :param method: api method call
+        :param params: params
+
+        :return: ResultContainer
+        """
+        if method in ["challenge", "alive"]:
+            return self.__request(method, params)
+        elif method in ["login"]:
+            return self.__request_without_sid(method, params)
+        else:
+            return self.__request_with_sid(method, params)
 
     def __create_object(self, json_data, method, params):
         """
@@ -180,7 +225,6 @@ class GlInet:
         resp = self.request("challenge", {"username": self._username})
         return resp.result
 
-    @decorators.logout_required
     def login(self):
         """
         Login and start background thread for keep_alive is configured. If password was set in constructor,
@@ -189,6 +233,11 @@ class GlInet:
 
         :return: True
         """
+
+        if self.is_alive():
+            logging.info("Already logged in, nothing to do.")
+            return True
+
         challenge = self.__challenge_login()
         if self._password is None:
             self._cached_login_data = self.__load_if_exist(self._login_cache_path)
@@ -207,6 +256,7 @@ class GlInet:
         except exceptions.AccessDeniedError:
             logging.warning("Could not login with current credentials, deleting cached credentials.")
             self._cached_login_data = None
+            self._sid = None
             os.remove(self._login_cache_path)
             raise
 
@@ -222,6 +272,8 @@ class GlInet:
             self._keep_alive_interrupt_event.clear()
             self._thread = threading.Thread(target=self.__keep_alive)
             self._thread.start()
+        else:
+            raise exceptions.KeepAliveThreadActiveError("Keep alive thread is still active but shouldn't.")
 
     def _stop_keep_alive_thread(self):
         logging.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
@@ -287,7 +339,6 @@ class GlInet:
             self._keep_alive_interrupt_event.wait(self._keep_alive_intervall)
         logging.info("Keep alive halted.")
 
-    @decorators.login_required
     def is_alive(self) -> bool:
         """
         Check if connection is alive.
@@ -302,14 +353,15 @@ class GlInet:
             return False
         return True
 
-    @decorators.login_required
     def logout(self) -> bool:
         """
         Logout and stop keep alive thread
 
         :return: True
         """
-        self.request("logout", {"sid": self._sid})
+        if self.is_alive():
+            self.request("logout", {"sid": self._sid})
+        self._session.cookies.clear()
         self._sid = None
         self._stop_keep_alive_thread()
         return True
@@ -333,7 +385,7 @@ class GlInet:
         """
         return hashlib.md5(f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()).hexdigest()
 
-    def __load_api_desciption(self, update: bool = False):
+    def __load_api_description(self, update: bool = False):
         """
         Load api description in json format
 
@@ -356,9 +408,6 @@ class GlInet:
                 api_description = pickle.load(f)
 
         return api_description
-
-    def check_initialized(self):
-        self.request("call", "")
 
     @decorators.login_required
     def get_api_client(self) -> api_helper.GlInetApi:

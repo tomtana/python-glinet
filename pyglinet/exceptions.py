@@ -11,3 +11,16 @@ class NotLoggedInError(Exception):
 class LoggedInError(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+class WrongParametersError(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+class MethodNotFoundError(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+class KeepAliveThreadActiveError(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
