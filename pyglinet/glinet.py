@@ -28,19 +28,6 @@ class GlInet:
 
     The api calls can either be made via the GlInetApi object,
     which can be constructed via the get_api_client method, or via the request method directly.
-
-    :param url: url to router rpc api
-    :param username: username, default is root.
-    :param password: password, if left empty, a prompt will ask you when login() is called. For security reasons,
-        you should never pass your password here.
-    :param protocol_version: default 2.0
-    :param keep_alive: if set to True, a background thread will be started to keep the connection alive
-    :param keep_alive_intervall: intervall in which the background thread sends requests to the router
-    :param verify_ssl_certificate: either True/False or path to certificate.
-    :param update_api_reference_cache: if True, data is loaded from the web, otherwise application tries first to
-        load data from cache.
-    :param api_reference_url: url to api description
-    :param cache_folder: folder where data is persisted. If left empty, default is `$home/.python-pyglinet`
     """
 
     def __init__(self,
@@ -54,6 +41,20 @@ class GlInet:
                  update_api_reference_cache: bool = False,
                  api_reference_url: str = "https://dev.gl-inet.cn/docs/api_docs_api/",
                  cache_folder: bool = None):
+        """
+        :param url: url to router rpc api
+        :param username: username, default is root.
+        :param password: password, if left empty, a prompt will ask you when login() is called. For security reasons,
+            you should never pass your password here.
+        :param protocol_version: default 2.0
+        :param keep_alive: if set to True, a background thread will be started to keep the connection alive
+        :param keep_alive_intervall: intervall in which the background thread sends requests to the router
+        :param verify_ssl_certificate: either True/False or path to certificate.
+        :param update_api_reference_cache: if True, data is loaded from the web, otherwise application tries first to
+            load data from cache.
+        :param api_reference_url: url to api description
+        :param cache_folder: folder where data is persisted. If left empty, default is `$home/.python-pyglinet`
+        """
         self._url = url
         self._query_id = 0
         if cache_folder is None:
@@ -92,6 +93,7 @@ class GlInet:
     def __generate_query_id(self) -> int:
         """
         Generate json-rpc query id
+
         :return: query id
         """
         qid = self._query_id
@@ -101,8 +103,10 @@ class GlInet:
     def __generate_request(self, method: str, params: Union[Dict, List[str], str]) -> dict:
         """
         Generate json for rpc api call
+
         :param method: rpc method
         :param params: params
+
         :return: json
         """
         # if there was an successful login before
@@ -134,6 +138,7 @@ class GlInet:
     def __request(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
         """
         Send request to router without considering the current login state. This may lead to misleading error messages.
+
         :param method: rpc method
         :param params: parameter
 
@@ -163,6 +168,7 @@ class GlInet:
     def __request_with_sid(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
         """
         Request which requires prior login
+
         :param method: api method call
         :param params: params
 
@@ -174,6 +180,7 @@ class GlInet:
     def __request_without_sid(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
         """
         Request which requires to be logged out
+
         :param method: api method call
         :param params: params
 
@@ -184,7 +191,8 @@ class GlInet:
     def request(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
         """
         Send request. Function checks if method requires login and chooses the respective request wrapper.
-        see :meth:`~pyglinet.GlInet.__request_with_sid` and :meth:`~pyglinet.GlInet._request`
+        see :meth:`~pyglinet.GlInet.__request_with_sid` and :meth:`~pyglinet.GlInet.__request`
+
         :param method: api method call
         :param params: params
 
@@ -202,6 +210,7 @@ class GlInet:
         Create recursive object from json api response
 
         Json data is stored in a convenience container, such that elements can be accessed as class attributes via '.'
+
         :param json_data: json data
         :param method: api method call
         :param params: params
@@ -217,9 +226,9 @@ class GlInet:
 
     def __challenge_login(self):
         """
-        Login challenge
+        Request cryptographic parameters to compute login hash. This is the first step in the login
+        sequence.
 
-        Requests required information to start login process.
         :return: challence
         """
         resp = self.request("challenge", {"username": self._username})
@@ -267,6 +276,12 @@ class GlInet:
 
     @decorators.login_required
     def _start_keep_alive_thread(self):
+        """
+        Starts keep alive background thread which calls :meth:`~pyglinet.GlInet.__keep_alive`
+        in the configured interval.
+
+        :return:
+        """
         if self._thread is None or not self._thread.is_alive():
             logging.debug("Starting background keep alive thread.")
             self._keep_alive_interrupt_event.clear()
@@ -276,10 +291,20 @@ class GlInet:
             raise exceptions.KeepAliveThreadActiveError("Keep alive thread is still active but shouldn't.")
 
     def _stop_keep_alive_thread(self):
+        """
+        Stop keep alive thread
+        """
         logging.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
         self._keep_alive_interrupt_event.set()
 
     def __update_login_and_cache(self, challenge, update_password=False):
+        """
+        Generates the login struct containing username, hash, salt and alg type. If data is diverging from
+        persisted set, old data will be deleted and new data will be persisted to file.
+
+        :param challenge: challenge as received containing nonce, salt and algo
+        :param update_password: if True, the user will be requested to enter the password
+        """
         password = self._password
 
         if update_password:
@@ -297,6 +322,7 @@ class GlInet:
     def __load_if_exist(self, file: str):
         """
         Load pickle file if it exists.
+
         :param file: path to file
 
         :return: None if file doesn't exist, else Data
@@ -313,6 +339,7 @@ class GlInet:
     def __dump_to_file(self, obj, file):
         """
         Dump pickle data to file.
+
         :param obj: object to dump
         :param file: path to file
 
@@ -369,6 +396,7 @@ class GlInet:
     def __generate_unix_passwd_hash(self, password: str, alg: str, salt: str) -> str:
         """
         Generate unix style hash with given algo and salt
+
         :param alg: algorithm
         :param salt: salt
 
@@ -379,6 +407,7 @@ class GlInet:
     def __generate_login_hash(self, challenge):
         """
         Generate final authentication hash
+
         :param challenge: dict with nonce, salt and algo type
 
         :return: authentication hash
@@ -389,8 +418,8 @@ class GlInet:
         """
         Load api description in json format
 
-        @:param update: if true, the api description is loaded from the web. If false, the program first tries to load
-        the data from the cache and in case this fails from the web.
+        :param update: if true, the api description is loaded from the web. If false, the program first tries to load
+            the data from the cache and in case this fails from the web.
 
         :return: api description
         """
