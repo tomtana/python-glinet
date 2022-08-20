@@ -43,6 +43,7 @@ def test_login_logout_caching(glinet_base):
     assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
     assert os.path.exists(glinet_base._api_reference_cache_path), "Api cache file was not created."
 
+
 @pytest.mark.vcr()
 def test_keep_alive(glinet_base):
     assert glinet_base.login(), "Login was not successful"
@@ -91,6 +92,7 @@ def test_api_client_01(glinet):
     assert not api_client.led.get_config().led_enable, "Value has not been set"
     api_client.led.set_config([{"led_enable": True}])
     assert api_client.led.get_config().led_enable, "Value has not been set"
+
 
 @pytest.mark.vcr()
 def test_requests(glinet_base):
