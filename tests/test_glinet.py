@@ -22,12 +22,6 @@ def glinet_base():
     gl.logout()
 
 
-@pytest.fixture(autouse=True)
-def glinet(glinet_base):
-    glinet_base.login()
-    return glinet_base
-
-
 @pytest.mark.vcr()
 def test_login_logout_caching(glinet_base):
     assert glinet_base.login(), "Login was not successful"
@@ -80,11 +74,13 @@ def test_unsuccessful_login():
 
 
 @pytest.mark.vcr()
-def test_api_client_01(glinet):
-    api_client = glinet.get_api_client()
+def test_api_client_01(glinet_base):
+    time.sleep(0.3)
+    glinet_base.login()
+    api_client = glinet_base.get_api_client()
     # check if request and api client have same behaviour
     res1 = api_client.clients.get_status()
-    res2 = glinet.request("call", ["clients", "get_status"]).result
+    res2 = glinet_base.request("call", ["clients", "get_status"]).result
     assert res1 == res2, "Diverging result with same api method."
 
     # read and write
@@ -96,10 +92,25 @@ def test_api_client_01(glinet):
 
 @pytest.mark.vcr()
 def test_requests(glinet_base):
+    time.sleep(0.3)
     glinet_base.login()
+    api_client = glinet_base.get_api_client()
     with(pytest.raises(exceptions.LoggedInError)):
         glinet_base.request("login", {})
     glinet_base.logout()
     with(pytest.raises(exceptions.NotLoggedInError)):
         glinet_base.request("logout", {})
+    with(pytest.raises(exceptions.NotLoggedInError)):
         glinet_base.request("call", ["whatever", "is_here"])
+    with(pytest.raises(exceptions.NotLoggedInError)):
+        api_client.led.get_config()
+
+
+@pytest.mark.vcr()
+def test_no_api_description(glinet_base):
+    glinet_base.login()
+    api_description = glinet_base._api_description
+    glinet_base._api_description = None
+    with(pytest.raises(exceptions.NoApiDescriptionError)):
+        glinet_base.get_api_client()
+    glinet_base._api_description = api_description

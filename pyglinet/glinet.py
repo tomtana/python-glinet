@@ -84,7 +84,7 @@ class GlInet:
         self._login_cache_path = os.path.join(self._cache_folder, "login.pkl")
         self._api_reference_cache_path = os.path.join(self._cache_folder, "api_reference.pkl")
         self._api_reference_url = api_reference_url
-        self._api_desciption = self.__load_api_description(update_api_reference_cache)
+        self._api_description = self.__load_api_description(update_api_reference_cache)
         self._keep_alive_interrupt_event = threading.Event()
 
     def __del__(self):
@@ -296,6 +296,7 @@ class GlInet:
         """
         logging.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
         self._keep_alive_interrupt_event.set()
+        self._thread.join()
 
     def __update_login_and_cache(self, challenge, update_password=False):
         """
@@ -445,4 +446,7 @@ class GlInet:
 
         :return: api client
         """
-        return api_helper.GlInetApi(self._api_desciption, self)
+        if self._api_description:
+            return api_helper.GlInetApi(self._api_description, self)
+        else:
+            raise exceptions.NoApiDescriptionError("Api description is not loaded.")

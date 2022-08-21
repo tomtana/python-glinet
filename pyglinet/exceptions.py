@@ -17,10 +17,17 @@ class WrongParametersError(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+
 class MethodNotFoundError(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+
 class KeepAliveThreadActiveError(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class NoApiDescriptionError(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
