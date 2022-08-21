@@ -22,12 +22,6 @@ def glinet_base():
     gl.logout()
 
 
-@pytest.fixture(autouse=True)
-def glinet(glinet_base):
-    glinet_base.login()
-    return glinet_base
-
-
 @pytest.mark.vcr()
 def test_login_logout_caching(glinet_base):
     assert glinet_base.login(), "Login was not successful"
@@ -80,11 +74,11 @@ def test_unsuccessful_login():
 
 
 @pytest.mark.vcr()
-def test_api_client_01(glinet):
-    api_client = glinet.get_api_client()
+def test_api_client_01(glinet_base):
+    api_client = glinet_base.get_api_client()
     # check if request and api client have same behaviour
     res1 = api_client.clients.get_status()
-    res2 = glinet.request("call", ["clients", "get_status"]).result
+    res2 = glinet_base.request("call", ["clients", "get_status"]).result
     assert res1 == res2, "Diverging result with same api method."
 
     # read and write
