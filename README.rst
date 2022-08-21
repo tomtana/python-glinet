@@ -1,4 +1,4 @@
-|GitHub Workflow Status (event)| |PyPI - Python Version| |PyPI| |GitHub Pages|
+|GitHub Workflow Status (event)| |GitHub Pages| |PyPI - Python Version| |PyPI|
 
 
 python-glinet - A Python3 Client for GL.Inet Router
