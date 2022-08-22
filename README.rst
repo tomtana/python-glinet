@@ -4,41 +4,27 @@
 python-glinet - A Python3 Client for GL.Inet Router
 ===================================================
 
--  **This python client provides full access to the GL.Inet Luci API.**
+-  **Python3 client providing full access to the GL.Inet Luci API.**
 -  **Supported firmware versions: 4.0 onwards**
 -  **Dynamic method creation including docstring from the gl.inet online
    documentation**
--  **Api responses are represented recursively as objects, such that you
+-  **Api responses are recursively build as objects, such that you
    can access all properties via '.'**
 -  **Cache for api description and hashed login**
 -  **Configurable background thread to keep connection alive**
 
 .. image:: https://github.com/tomtana/python-glinet/raw/main/ressources/python_glinet_demo.gif
 
-About
-------
+.. note::
 
-The original use case was to automatically generate and write nordvpn
-wireguard configs to my slate axt-1800 router, but then I found an
-elegant way to autogenerate methods for the whole api and
-``python-glinet`` was born.
-
-It should be noted that GL.Inet changed the api mechanism from REST to
-JSON-RPC with the introduction of the firmware 4.0. Therefore, older
-versions are not supported.
-
-Also, there is no official documentation in English yet. The client
-parses the Chinese documentation from
-`here <https://dev.gl-inet.cn/docs/api_docs_page>`__ and dynamically
-creates the api methods. Once it is available, the repo will be updated.
-
-The best way to navigate and explore the api is within an ipython shell.
-A wrapper for ipython and terminal is on the roadmap.
+   -  GL.Inet changed the api mechanism from REST to JSON-RPC with the introduction of the firmware 4.0. Therefore, older versions are not supported.
+   -  There is no official documentation in English yet. The client parses the Chinese documentation from `here <https://dev.gl-inet.cn/docs/api_docs_page>`__ and dynamically creates the api methods. Once it is available, the repo will be updated.
+   -  The best way to navigate and explore the api is within an ipython shell. A wrapper for ipython and terminal is on the roadmap.
 
 Installation
 -------------
 
-PiP
+PIP
 ~~~
 
 .. code-block:: sh
@@ -69,7 +55,7 @@ Getting Started
 
 The heart piece of  ``python-glinet`` is the ``GlInet`` class. It is manages authentication, session and communication
 with the api. In case you modified the router default settings such as ip-address or username you need to pass them as
-parameter (see the documentation of the ``GlInet`` class for more details).
+parameter (see the documentation of the `GlInet <https://tomtana.github.io/python-glinet/glinet.html>`__ class for more details).
 
 For browsing the api using the dynamically created api_client, it is assumed that the commands are executed in an
 ipython shell.
@@ -82,9 +68,8 @@ ipython shell.
 
 .. note::
 
-    -  The constructor is checking if a api description is already in the cache and will load it from
-the gl.inet online documentation if not.
-    -  Make sure you check and understand the default settings
+   -  The constructor is checking if a api description is already in the cache and will load it from the gl.inet online documentation if not.
+   -  Make sure you check and understand the default settings
 
 .. code:: python
 
@@ -136,54 +121,58 @@ Just call your client to see all available api function groups.
 
    client
 
-.. code:: bash
+.. collapse:: Output
 
-   Out[11]: 
-   Function
-   ------------------
-   repeater
-   rs485
-   qos
-   acl
-   modem
-   logread
-   igmp
-   custom_dns
-   dns
-   dlna
-   nas_web
-   adguardhome
-   s2s
-   samba
-   switch_button
-   diag
-   rtty
-   network
-   upgrade
-   reboot
-   wg_server
-   firewall
-   ovpn_server
-   vpn_policy
-   fan
-   system
-   wg_client
-   cable
-   led
-   ui
-   netmode
-   ddns
-   ipv6
-   ovpn_client
-   plugins
-   tethering
-   macclone
-   lan
-   edgerouter
-   clients
-   wifi
-   cloud
-   cloud_batch_manage
+    .. code:: bash
+
+       Out[11]:
+       Function
+       ------------------
+       repeater
+       rs485
+       qos
+       acl
+       modem
+       logread
+       igmp
+       custom_dns
+       dns
+       dlna
+       nas_web
+       adguardhome
+       s2s
+       samba
+       switch_button
+       diag
+       rtty
+       network
+       upgrade
+       reboot
+       wg_server
+       firewall
+       ovpn_server
+       vpn_policy
+       fan
+       system
+       wg_client
+       cable
+       led
+       ui
+       netmode
+       ddns
+       ipv6
+       ovpn_client
+       plugins
+       tethering
+       macclone
+       lan
+       edgerouter
+       clients
+       wifi
+       cloud
+       cloud_batch_manage
+
+
 
 Methods
 ^^^^^^^
@@ -195,33 +184,35 @@ enter.
 
    client.wg_client
 
-.. code:: bash
+.. collapse:: Output
 
-   Out[6]:
-   Function
-   --------------------
-   get_recommend_config
-   get_third_config
-   add_config
-   set_config
-   remove_config
-   clear_config_list
-   get_config_list
-   start
-   stop
-   get_status
-   check_config
-   confirm_config
-   add_group
-   remove_group
-   set_group
-   get_group_list
-   get_all_config_list
-   set_proxy
-   add_route
-   set_route
-   get_route_list
-   remove_route
+    .. code:: bash
+
+       Out[6]:
+       Function
+       --------------------
+       get_recommend_config
+       get_third_config
+       add_config
+       set_config
+       remove_config
+       clear_config_list
+       get_config_list
+       start
+       stop
+       get_status
+       check_config
+       confirm_config
+       add_group
+       remove_group
+       set_group
+       get_group_list
+       get_all_config_list
+       set_proxy
+       add_route
+       set_route
+       get_route_list
+       remove_route
 
 Parameters
 ^^^^^^^^^^
@@ -234,27 +225,29 @@ optional.
 
    api.wg_client.set_config
 
-.. code:: bash
+.. collapse:: Output
 
-   Out[8]: 
-   Parameter              Type    Description
-   ---------------------  ------  ------------------
-   name                   string  节点名
-   address_v4             string  节点IPv4子网
-   ?address_v6            string  节点IPv6子网
-   private_key            string  节点私钥
-   allowed_ips            string  节点的allowedips
-   end_point              string  节点的endpoint
-   public_key             string  节点公钥
-   ?dns                   string  节点的dns
-   ?preshared_key         string  预分享密钥
-   ?ipv6_enable           bool    是否启用IPv6
-   presharedkey_enable    bool    是否使用预分享密钥
-   group_id               number  组ID
-   peer_id                number  配置ID
-   ?listen_port           number  监听端口
-   ?persistent_keepalive  number  节点保活
-   ?mtu                   number  节点的mtu
+    .. code:: bash
+
+       Out[8]:
+       Parameter              Type    Description
+       ---------------------  ------  ------------------
+       name                   string  节点名
+       address_v4             string  节点IPv4子网
+       ?address_v6            string  节点IPv6子网
+       private_key            string  节点私钥
+       allowed_ips            string  节点的allowedips
+       end_point              string  节点的endpoint
+       public_key             string  节点公钥
+       ?dns                   string  节点的dns
+       ?preshared_key         string  预分享密钥
+       ?ipv6_enable           bool    是否启用IPv6
+       presharedkey_enable    bool    是否使用预分享密钥
+       group_id               number  组ID
+       peer_id                number  配置ID
+       ?listen_port           number  监听端口
+       ?persistent_keepalive  number  节点保活
+       ?mtu                   number  节点的mtu
 
 Docstring
 ^^^^^^^^^
@@ -266,37 +259,39 @@ will show all the parameter and usage examples.
 
    api.wg_client.set_config?
 
-.. code:: text
+.. collapse:: Output
 
-   Signature: api.wg_client.set_config(params=None)
-   Type:      GlInetApiCall
-   File:      ~/.local/lib/python3.10/site-packages/pyglinet/api_helper.py
-   Docstring:
-   Available parameters (?=optional):
-   Parameter              Type    Description
-   ---------------------  ------  ------------------
-   name                   string  节点名
-   address_v4             string  节点IPv4子网
-   ?address_v6            string  节点IPv6子网
-   private_key            string  节点私钥
-   allowed_ips            string  节点的allowedips
-   end_point              string  节点的endpoint
-   public_key             string  节点公钥
-   ?dns                   string  节点的dns
-   ?preshared_key         string  预分享密钥
-   ?ipv6_enable           bool    是否启用IPv6
-   presharedkey_enable    bool    是否使用预分享密钥
-   group_id               number  组ID
-   peer_id                number  配置ID
-   ?listen_port           number  监听端口
-   ?persistent_keepalive  number  节点保活
-   ?mtu                   number  节点的mtu
+    .. code:: text
 
-   Example request:
-   {\"jsonrpc\":\"2.0\",\"method\":\"call\",\"params\":[\"\",\"wg-client\",\"set_config\",{\"group_id\":3212,\"peer_id\":1254,\"name\":\"test\",\"address_v4\":\"10.8.0.0/24\",\"address_v6\":\"fd00:db8:0:123::/64\",\"private_key\":\"XVpIdr+oYjTcgDwzSZmNa1nSsk8JO+tx1NBo17LDBAI=\",\"allowed_ips\":\"0.0.0.0/0,::/0\",\"end_point\":\"103.231.88.18:3102\",\"public_key\":\"zv0p34WZN7p2vIgehwe33QF27ExjChrPUisk481JHU0=\",\"dns\":\"193.138.219.228\",\"presharedkey_enable\":false,\"listen_port\":22536,\"persistent_keepalive\":25,\"mtu\":1420,\"ipv6_enable\":true}],\"id\":1}
+       Signature: api.wg_client.set_config(params=None)
+       Type:      GlInetApiCall
+       File:      ~/.local/lib/python3.10/site-packages/pyglinet/api_helper.py
+       Docstring:
+       Available parameters (?=optional):
+       Parameter              Type    Description
+       ---------------------  ------  ------------------
+       name                   string  节点名
+       address_v4             string  节点IPv4子网
+       ?address_v6            string  节点IPv6子网
+       private_key            string  节点私钥
+       allowed_ips            string  节点的allowedips
+       end_point              string  节点的endpoint
+       public_key             string  节点公钥
+       ?dns                   string  节点的dns
+       ?preshared_key         string  预分享密钥
+       ?ipv6_enable           bool    是否启用IPv6
+       presharedkey_enable    bool    是否使用预分享密钥
+       group_id               number  组ID
+       peer_id                number  配置ID
+       ?listen_port           number  监听端口
+       ?persistent_keepalive  number  节点保活
+       ?mtu                   number  节点的mtu
 
-   Example response:
-   {\"jsonrpc\": \"2.0\", \"id\": 1, \"result\": {}}
+       Example request:
+       {\"jsonrpc\":\"2.0\",\"method\":\"call\",\"params\":[\"\",\"wg-client\",\"set_config\",{\"group_id\":3212,\"peer_id\":1254,\"name\":\"test\",\"address_v4\":\"10.8.0.0/24\",\"address_v6\":\"fd00:db8:0:123::/64\",\"private_key\":\"XVpIdr+oYjTcgDwzSZmNa1nSsk8JO+tx1NBo17LDBAI=\",\"allowed_ips\":\"0.0.0.0/0,::/0\",\"end_point\":\"103.231.88.18:3102\",\"public_key\":\"zv0p34WZN7p2vIgehwe33QF27ExjChrPUisk481JHU0=\",\"dns\":\"193.138.219.228\",\"presharedkey_enable\":false,\"listen_port\":22536,\"persistent_keepalive\":25,\"mtu\":1420,\"ipv6_enable\":true}],\"id\":1}
+
+       Example response:
+       {\"jsonrpc\": \"2.0\", \"id\": 1, \"result\": {}}
 
 Method call
 ^^^^^^^^^^^
@@ -324,7 +319,7 @@ API Access Via Direct Request
 
 Instead of using the dynamically created api_client, it is also possible
 to use the ``GlInet`` instance to make api requests. In fact, the
-api_client uses the same mechanism.
+api_client uses the ``GlInet`` session under the hood.
 
 Once logged in, you simply can use the
 ``glinet.request(method, params)`` method to access or retrieve data
