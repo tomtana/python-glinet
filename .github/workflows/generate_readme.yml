@@ -24,7 +24,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Convert to Markdown
         run: |
-          docker run --rm --volume "$(pwd):/data" --user $(id -u):$(id -g) pandoc/core docs/README.rst -o README.md
+          docker run --rm --volume "$(pwd):/data" --user $(id -u):$(id -g) pandoc/core docs/README.rst \
+          --filter docs/conversion_filter.py -o README.md
       - name: Check in README.md
         run: |
           git config --global user.name 'GH Action'
