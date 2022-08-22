@@ -5,7 +5,7 @@ import os
 import sys
 from io import StringIO
 from contextlib import contextmanager
-
+import pathlib
 
 @contextmanager
 def replace_stdin(target):
@@ -17,7 +17,7 @@ def replace_stdin(target):
 
 @pytest.fixture(scope="module")
 def vcr_config():
-    return {"record_mode": "once"}
+    return {"record_mode": "all"}
 
 
 @pytest.fixture(scope="module")
@@ -50,6 +50,17 @@ def test_login_logout_caching(glinet_base):
     assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
     assert os.path.exists(glinet_base._api_reference_cache_path), "Api cache file was not created."
 
+    #check if data is loaded from cache
+    gl = GlInet()
+
+    #check if custom path is working
+    cache_folder = pathlib.Path.home().as_posix() + "/.python-glinet"
+    pathlib.Path(cache_folder).mkdir(exist_ok=True)
+    gl = GlInet(cache_folder=cache_folder)
+    with pytest.raises(FileExistsError):
+        gl = GlInet(cache_folder="/doesnt_exist")
+
+
 
 @pytest.mark.vcr()
 def test_keep_alive(glinet_base):
@@ -57,6 +68,10 @@ def test_keep_alive(glinet_base):
     assert glinet_base.login(), "Login was not successful"
     assert glinet_base.is_alive(), "Not logged in"
     assert glinet_base._thread.is_alive(), "Keep alive thread not working"
+    with pytest.raises(exceptions.KeepAliveThreadActiveError):
+        glinet_base._start_keep_alive_thread()
+    glinet_base._sid = glinet_base._sid[:-2] + "aA"
+    assert not glinet_base.is_alive(), "Should not be alive but is"
     glinet_base.logout()
     glinet_base._thread.join()
     assert not glinet_base.is_alive(), "Still logged in"
@@ -112,6 +127,10 @@ def test_requests(glinet):
     api_client = glinet.get_api_client()
     with(pytest.raises(exceptions.LoggedInError)):
         glinet.request("login", {})
+    with pytest.raises(exceptions.WrongParametersError):
+        glinet.request("call", ["wrong_parameter"])
+    with pytest.raises(exceptions.MethodNotFoundError):
+        glinet.request("call", ["led", "wrong_method"])
     glinet.logout()
     with(pytest.raises(exceptions.NotLoggedInError)):
         glinet.request("logout", {})

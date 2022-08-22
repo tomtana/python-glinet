@@ -40,7 +40,7 @@ class GlInet:
                  verify_ssl_certificate: bool = False,
                  update_api_reference_cache: bool = False,
                  api_reference_url: str = "https://dev.gl-inet.cn/docs/api_docs_api/",
-                 cache_folder: bool = None):
+                 cache_folder: str = None):
         """
         :param url: url to router rpc api
         :param username: username, default is root.
@@ -66,7 +66,7 @@ class GlInet:
             if os.path.exists(cache_folder):
                 self._cache_folder = cache_folder
             else:
-                raise FileNotFoundError(f"Path {cache_folder} doesnt exist.")
+                raise FileExistsError(f"Path {cache_folder} doesnt exist.")
         self._password = password
         self._username = username
         self._protocol_version = protocol_version
@@ -288,7 +288,7 @@ class GlInet:
             self._thread = threading.Thread(target=self.__keep_alive)
             self._thread.start()
         else:
-            raise exceptions.KeepAliveThreadActiveError("Keep alive thread is still active but shouldn't.")
+            raise exceptions.KeepAliveThreadActiveError("Keep alive thread is already alive.")
 
     def _stop_keep_alive_thread(self):
         """
