@@ -7,7 +7,8 @@ Version](https://img.shields.io/pypi/pyversions/python-glinet)](https://pypi.org
 [![Code
 Cov](https://codecov.io/gh/tomtana/python-glinet/branch/main/graph/badge.svg?token=976L8ESH8K)](https://codecov.io/gh/tomtana/python-glinet)
 
-# python-glinet - A Python3 Client for GL.Inet Router
+python-glinet - A Python3 Client for GL.Inet Router
+===================================================
 
 -   **Python3 client providing full access to the GL.Inet Luci API.**
 -   **Supported firmware versions: 4.0 onwards**
@@ -20,34 +21,31 @@ Cov](https://codecov.io/gh/tomtana/python-glinet/branch/main/graph/badge.svg?tok
 
 ![image](https://github.com/tomtana/python-glinet/raw/main/ressources/python_glinet_demo.gif)
 
-::: note
-::: title
-Note
-:::
+**Note:**
 
 -   GL.Inet changed the api mechanism from REST to JSON-RPC with the
     introduction of the firmware 4.0. Therefore, older versions are not
     supported.
--   There is no official documentation in English yet. The client parses
+-   There is no official English api documentation. The client parses
     the Chinese documentation from
     [here](https://dev.gl-inet.cn/docs/api_docs_page) and dynamically
     creates the api methods. Once it is available, the repo will be
     updated.
 -   The best way to navigate and explore the api is within an ipython
     shell. A wrapper for ipython and terminal is on the roadmap.
-:::
 
-## Installation
+Installation
+------------
 
 ### PIP
 
-``` sh
+``` {.sourceCode .sh}
 pip install python-glinet
 ```
 
 ### From Repo
 
-``` sh
+``` {.sourceCode .sh}
 #clone repository
 git clone https://github.com/tomtana/python-glinet.git
 cd python-glinet
@@ -56,16 +54,17 @@ cd python-glinet
 It is strongly recommended to install the package inside an python
 virtual environment (see
 [here](https://docs.python.org/3/tutorial/venv.html) for more infos).
-The pip parameter `-e` is optional, and gives you the possibility to
-edit the `python-glinet` module in the cloned folder.
+The pip parameter `-e` is optional and gives you the possibility to edit
+the `python-glinet` directly in the folder.
 
-``` sh
+``` {.sourceCode .sh}
 python3 -m venv venv
 source venv/bin/activate
 pip install -e .
 ```
 
-## Getting Started
+Getting Started
+---------------
 
 The heart piece of `python-glinet` is the `GlInet` class. It is manages
 authentication, session and communication with the api. In case you
@@ -74,66 +73,67 @@ need to pass them as parameter (see the documentation of the
 [GlInet](https://tomtana.github.io/python-glinet/glinet.html) class for
 more details).
 
-For browsing the api using the dynamically created api_client, it is
+For browsing the api using the dynamically created api\_client, it is
 assumed that the commands are executed in an ipython shell.
 
-::: warning
-::: title
-Warning
-:::
+**Warning:**
 
 Even though possible, it is strongly discouraged to pass the password as
 a parameter.
-:::
 
-::: note
-::: title
-Note
-:::
+**Note:**
 
 -   The constructor is checking if a api description is already in the
-    cache and will load it from the gl.inet online documentation if not.
+    persistence and will load it from the gl.inet online documentation
+    if not.
 -   Make sure you check and understand the default settings
-:::
 
-``` python
+``` {.sourceCode .python}
 from pyglinet import GlInet
 glinet = GlInet()
 ```
 
 ### Login
 
-``` python
+``` {.sourceCode .python}
 glinet.login()
 ```
 
-::: note
-::: title
-Note
-:::
+The login method call has deliberately not been integrated into the
+constructor. For convenience it is possible to instantiate the object
+and login as shown below.
+
+``` {.sourceCode .python}
+# one liner: instantiation and login
+glinet = GlInet().login()
+```
+
+**Note:**
 
 -   if no password is passed as parameter in the constructor, `login()`
     will try to load login data from persistence
 -   if no success ask via prompt and persist settings
 -   start background thread to keep connection alive
-:::
 
 ### API Access Via Dynamically Created Client
 
 Make sure you are in an ipython shell and logged in. Then, generate the
 `api_client`.
 
-``` python
+``` {.sourceCode .python}
 api_client = glinet.get_api_client()
 ```
+
+You have also direct access to the api via the `api` property of the
+`GlInet` instance.
 
 #### General
 
 -   The api structure is as follow:
-    **client.\<functionial_group\>.\<method\>**
+    **client.\<functionial\_group\>.\<method\>**
 -   Due to python naming rules for variables, all \"-\" are replaced
     with \"\_\" for the api method construction. **e.g. wg-client
-    becomes wg_client.**
+    becomes wg\_client.**
 -   Use code completion and docstring to intuitively navigate the api
 
 #### Functional Groups
@@ -142,10 +142,11 @@ Just call your client to see all available api function groups.
 
     api_client
 
-::: collapse
-Output
+Or same result with
 
-``` bash
+    glinet.api
+
+``` {.sourceCode .bash}
 Out[11]:
 Function
 ------------------
@@ -193,21 +194,17 @@ wifi
 cloud
 cloud_batch_manage
 ```
-:::
 
 #### Methods
 
 To explore the methods of a function group, just select it and hit
 enter.
 
-``` python
+``` {.sourceCode .python}
 api_client.wg_client
 ```
 
-::: collapse
-Output
-
-``` bash
+``` {.sourceCode .bash}
 Out[6]:
 Function
 --------------------
@@ -234,22 +231,17 @@ set_route
 get_route_list
 remove_route
 ```
-:::
 
 #### Parameters
 
 Select your method and press enter. A list for all possible parameters
-are printed. If a parameter is prepended with `?`, it means it is
-optional.
+are printed. A parameter prepended with `?` is optional.
 
-``` python
+``` {.sourceCode .python}
 api_client.wg_client.set_config
 ```
 
-::: collapse
-Output
-
-``` bash
+``` {.sourceCode .bash}
 Out[8]:
 Parameter              Type    Description
 ---------------------  ------  ------------------
@@ -270,21 +262,17 @@ peer_id                number  配置ID
 ?persistent_keepalive  number  节点保活
 ?mtu                   number  节点的mtu
 ```
-:::
 
 #### Docstring
 
 You can also show the docstring by appending a `?` to the method. It
-will show all the parameter and usage examples.
+will show all the parameters and usage examples.
 
-``` text
+``` {.sourceCode .text}
 api_client.wg_client.set_config?
 ```
 
-::: collapse
-Output
-
-``` text
+``` {.sourceCode .text}
 Signature: api.wg_client.set_config(params=None)
 Type:      GlInetApiCall
 File:      ~/.local/lib/python3.10/site-packages/pyglinet/api_helper.py
@@ -315,7 +303,6 @@ Example request:
 Example response:
 {\"jsonrpc\": \"2.0\", \"id\": 1, \"result\": {}}
 ```
-:::
 
 #### Method call
 
@@ -324,7 +311,7 @@ how parameters need to be passed.
 
     api_client.wg_client.get_all_config_list()
 
-``` bash
+``` {.sourceCode .bash}
 Out[12]: {'name': 'wg_client__get_all_config_list', 'config_list': [{'name': 'wg_client__get_all_config_list', 'username': '', 'group_name': 'AzireVPN', 'peers': [], 'password': '', 'auth_type': 1, 'group_id': 9690}]}
 ```
 
@@ -336,21 +323,21 @@ data.
 
 ### API Access Via Direct Request
 
-Instead of using the dynamically created api_client, it is also possible
-to use the `GlInet` instance to make api requests. In fact, the
-api_client uses the `GlInet` session under the hood.
+Instead of using the dynamically created api\_client, it is also
+possible to use the `GlInet` instance to make api requests. In fact, the
+api\_client uses the `GlInet` session under the hood.
 
 Once logged in, you simply can use the `glinet.request(method, params)`
 method to access or retrieve data from the api. Information about the
 method and the parameters can either be found in the
 [documentation](https://dev.gl-inet.cn/docs/api_docs_page) or via the
-api_client.
+api\_client.
 
 e.g.
 
     glinet.request("call", ["adguardhome", "get_config"])
 
-``` bash
+``` {.sourceCode .bash}
 Out[12]: {'name': 'adguardhome__get_config', 'id': 13, 'jsonrpc': '2.0', 'result': {'name': 'adguardhome__get_config', 'enabled': False}}
 ```
 
@@ -358,33 +345,30 @@ is equivalent to
 
     api_client.adguardhome.get_config()
 
-``` bash
+``` {.sourceCode .bash}
 Out[13]: {'name': 'adguardhome__get_config', 'enabled': False}
 ```
 
-::: note
-::: title
-Note
-:::
+**Note:**
 
 The output of the `request` method returns the whole response body
-whereas the api_client just returns the result dict.
-:::
+whereas the api\_client just returns the result dict.
 
-## Roadmap
+Roadmap
+-------
 
 ### V1.0.0
 
--   [x] Add dynamically docstring for API calls
--   [x] Create pip compliant package
--   [x] Publish pip package
--   [x] Add tests
--   [x] Improve documentation
--   [x] Increase test coverage
--   [ ] replace crypt dependency to allow also Windows execution
--   [ ] Add wrapper for execution via terminal
+-   ☒ Add dynamically docstring for API calls
+-   ☒ Create pip compliant package
+-   ☒ Publish pip package
+-   ☒ Add tests
+-   ☒ Improve documentation
+-   ☒ Increase test coverage
+-   ☐ replace crypt dependency to allow also Windows execution
+-   ☐ Add wrapper for execution via terminal
 
 ### V2.0.0
 
--   [ ] Add asyncio support
--   [ ] \...
+-   ☐ Add asyncio support
+-   ☐ \...
