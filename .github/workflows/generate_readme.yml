@@ -25,7 +25,7 @@ jobs:
       - name: Convert to Markdown
         run: |
           docker run --rm --volume "$(pwd):/data" --user $(id -u):$(id -g) \
-          pandoc/core sh -c "sudo apt-get install python3" 
+          pandoc/core /bin/bash -c "sudo apt-get install python3" 
           docker run --rm --volume "$(pwd):/data" --user $(id -u):$(id -g) \
           pandoc/core docs/README.rst --filter docs/conversion_filter.py -o README.md
       - name: Check in README.md
