@@ -17,7 +17,7 @@ def replace_stdin(target):
 
 @pytest.fixture(scope="module")
 def vcr_config():
-    return {"record_mode": "all"}
+    return {"record_mode": "once"}
 
 
 @pytest.fixture(scope="module")
