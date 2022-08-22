@@ -8,3 +8,6 @@ __*/
 /docs/_build
 /docs/_static
 /docs/_templates
+README.md
+/tests/coverage.xml
+.coverage

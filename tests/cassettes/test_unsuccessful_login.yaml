@@ -6,7 +6,7 @@ interactions:
       Accept:
       - '*/*'
       Accept-Encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       Connection:
       - keep-alive
       Content-Length:
@@ -28,7 +28,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Mon, 22 Aug 2022 11:15:42 GMT
+      - Mon, 22 Aug 2022 20:19:58 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -43,7 +43,7 @@ interactions:
       Accept:
       - '*/*'
       Accept-Encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       Connection:
       - keep-alive
       Content-Length:
@@ -56,7 +56,7 @@ interactions:
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":29,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"wsOfPwuWs16vUiOJfKqYSQZ7uiaa0dM9"}}
+      string: '{"id":29,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"etlUDd4toLYKrF05k3gUn0EjHC7Gny1L"}}
 
         '
     headers:
@@ -65,7 +65,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Mon, 22 Aug 2022 11:15:42 GMT
+      - Mon, 22 Aug 2022 20:19:58 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -75,12 +75,12 @@ interactions:
       message: OK
 - request:
     body: '{"jsonrpc": "2.0", "id": 30, "method": "login", "params": {"username":
-      "root", "hash": "6867bcabfd63c3823f44b14cdaba5540"}}'
+      "root", "hash": "71a1b0cb35cb745ebf5ad372eb559ac8"}}'
     headers:
       Accept:
       - '*/*'
       Accept-Encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       Connection:
       - keep-alive
       Content-Length:
@@ -93,7 +93,7 @@ interactions:
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":30,"jsonrpc":"2.0","result":{"username":"root","sid":"7xbYuoXAnmWKHgBt8AuKBdLk60H6av9Z"}}
+      string: '{"id":30,"jsonrpc":"2.0","result":{"username":"root","sid":"xGscE4bxiIvq4rjItXwf05yw79Blaiir"}}
 
         '
     headers:
@@ -102,11 +102,11 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Mon, 22 Aug 2022 11:15:42 GMT
+      - Mon, 22 Aug 2022 20:19:58 GMT
       Server:
       - nginx/1.17.7
       Set-Cookie:
-      - Admin-Token=7xbYuoXAnmWKHgBt8AuKBdLk60H6av9Z
+      - Admin-Token=xGscE4bxiIvq4rjItXwf05yw79Blaiir
       Transfer-Encoding:
       - chunked
     status:
@@ -119,7 +119,7 @@ interactions:
       Accept:
       - '*/*'
       Accept-Encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       Connection:
       - keep-alive
       Content-Length:
@@ -132,7 +132,7 @@ interactions:
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":0,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"lCinUlid0hiZOuOxSds9LqcWb59vDc2o"}}
+      string: '{"id":0,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"U1H0k8prKybfF6iWfX0qy1jBBTX9l7f1"}}
 
         '
     headers:
@@ -141,7 +141,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Mon, 22 Aug 2022 11:15:43 GMT
+      - Mon, 22 Aug 2022 20:19:58 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -156,7 +156,7 @@ interactions:
       Accept:
       - '*/*'
       Accept-Encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       Connection:
       - keep-alive
       Content-Length:
@@ -169,7 +169,7 @@ interactions:
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":1,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"oCed9PvMhIrkxgAmtwzU717n9AC4J5X2"}}
+      string: '{"id":1,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"MHxEPGMfxT9ykKphx32OZIFjzkJOWIVb"}}
 
         '
     headers:
@@ -178,7 +178,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Mon, 22 Aug 2022 11:15:43 GMT
+      - Mon, 22 Aug 2022 20:19:58 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -188,12 +188,12 @@ interactions:
       message: OK
 - request:
     body: '{"jsonrpc": "2.0", "id": 2, "method": "login", "params": {"username": "root",
-      "hash": "bb58c884d037f3d706b75bb4e8b6bad8"}}'
+      "hash": "29e3f00fb96f1fc845359bf6debfb9d5"}}'
     headers:
       Accept:
       - '*/*'
       Accept-Encoding:
-      - gzip, deflate
+      - gzip, deflate, br
       Connection:
       - keep-alive
       Content-Length:
@@ -215,7 +215,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Mon, 22 Aug 2022 11:15:43 GMT
+      - Mon, 22 Aug 2022 20:19:58 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:

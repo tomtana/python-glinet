@@ -113,7 +113,8 @@ def test_api_client_01(glinet):
     res1 = api_client.clients.get_status()
     res2 = glinet.request("call", ["clients", "get_status"]).result
     res3 = api_client.clients.get_status.call()
-    assert res1 == res2 == res3, "Diverging result with same api method."
+    res4 = glinet.api.clients.get_status()
+    assert res1 == res2 == res3 == res4, "Diverging result with same api method."
 
     #test str and repr from ResultContainer
     str(res1)

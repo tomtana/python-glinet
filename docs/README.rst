@@ -18,7 +18,7 @@ python-glinet - A Python3 Client for GL.Inet Router
 .. note::
 
    -  GL.Inet changed the api mechanism from REST to JSON-RPC with the introduction of the firmware 4.0. Therefore, older versions are not supported.
-   -  There is no official documentation in English yet. The client parses the Chinese documentation from `here <https://dev.gl-inet.cn/docs/api_docs_page>`__ and dynamically creates the api methods. Once it is available, the repo will be updated.
+   -  There is no official English api documentation. The client parses the Chinese documentation from `here <https://dev.gl-inet.cn/docs/api_docs_page>`__ and dynamically creates the api methods. Once it is available, the repo will be updated.
    -  The best way to navigate and explore the api is within an ipython shell. A wrapper for ipython and terminal is on the roadmap.
 
 Installation
@@ -42,7 +42,7 @@ From Repo
 
 It is strongly recommended to install the package inside an python
 virtual environment (see `here <https://docs.python.org/3/tutorial/venv.html>`__ for more infos). The pip
-parameter ``-e`` is optional, and gives you the possibility to edit the ``python-glinet`` module in the cloned folder.
+parameter ``-e`` is optional and gives you the possibility to edit the ``python-glinet`` directly in the folder.
 
 .. code-block:: sh
 
@@ -68,7 +68,7 @@ ipython shell.
 
 .. note::
 
-   -  The constructor is checking if a api description is already in the cache and will load it from the gl.inet online documentation if not.
+   -  The constructor is checking if a api description is already in the persistence and will load it from the gl.inet online documentation if not.
    -  Make sure you check and understand the default settings
 
 .. code:: python
@@ -84,6 +84,15 @@ Login
 .. code:: python
 
    glinet.login()
+
+..
+
+The login method call has deliberately not been integrated into the constructor. For convenience
+it is possible to instantiate the object and login as shown below.
+
+.. code:: python
+   # one liner: instantiation and login
+   glinet = GlInet().login()
 
 ..
 
@@ -218,8 +227,7 @@ Parameters
 ^^^^^^^^^^
 
 Select your method and press enter. A list for all possible parameters
-are printed. If a parameter is prepended with ``?``, it means it is
-optional.
+are printed. A parameter prepended with ``?`` is optional.
 
 .. code:: python
 
@@ -253,7 +261,7 @@ Docstring
 ^^^^^^^^^
 
 You can also show the docstring by appending a ``?`` to the method. It
-will show all the parameter and usage examples.
+will show all the parameters and usage examples.
 
 .. code:: text
 
