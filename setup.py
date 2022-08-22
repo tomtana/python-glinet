@@ -1,6 +1,6 @@
 import setuptools
 
-with open("docs/README.rst", "r", encoding="utf-8") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open("LICENSE", "r", encoding="utf-8") as fh:
@@ -8,12 +8,12 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="python-glinet",
-    version="0.5.2",
+    version="0.5.3",
     author="Tomtana",
     author_email="python@tomtana.net",
     description="Python3 client for Gl.Inet LUCI API firmware 4.0 onwards.",
     long_description=long_description,
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     url="https://github.com/tomtana/python-glinet",
     project_urls={
         "Bug Tracker": "https://github.com/tomtana/python-glinet/issues",
