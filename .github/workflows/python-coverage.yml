@@ -30,7 +30,7 @@ jobs:
         if [ -f setup.py ]; then pip install .; fi
     - name: Generate coverage report
       run: |
-        cd tests/
+        echo "$(ls -ls)"
         pytest --cov=pyglinet . --cov-report=xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
