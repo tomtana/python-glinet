@@ -365,6 +365,7 @@ V1.0.0
 -  ☒ Add tests
 -  ☒ Improve documentation
 -  ☐ Increase test coverage
+-  ☐ replace crypt dependency to allow also Windows execution
 
 
 V2.0.0
