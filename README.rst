@@ -54,15 +54,9 @@ From Repo
    git clone https://github.com/tomtana/python-glinet.git
    cd python-glinet
 
-Install package directly. The ``-e`` parameter lets you edit the files.
-If this is not needed to can also install without the ``-e`` parameter.
-
-.. code-block:: sh
-
-   pip install -e .
-
-Alternatively install it in an Python virtual environment (see
-`here <https://docs.python.org/3/tutorial/venv.html>`__ for more infos)
+It is strongly recommended to install the package inside an python
+virtual environment (see `here <https://docs.python.org/3/tutorial/venv.html>`__ for more infos). The pip
+parameter ``-e`` is optional, and gives you the possibility to edit the ``python-glinet`` module in the cloned folder.
 
 .. code-block:: sh
 
@@ -73,38 +67,51 @@ Alternatively install it in an Python virtual environment (see
 Getting Started
 ---------------
 
-Login
-~~~~~
+The heart piece of  ``python-glinet`` is the ``GlInet`` class. It is manages authentication, session and communication
+with the api. In case you modified the router default settings such as ip-address or username you need to pass them as
+parameter (see the documentation of the ``GlInet`` class for more details).
 
-Login is as easy as shown below. Only in case you modified the router
-default settings such as ip-address or username you need to pass them as
-parameter (see the documentation of the GlInet class for more details).
-The ``login`` method will ask you to input the password first time you
-call it.
+For browsing the api using the dynamically created api_client, it is assumed that the commands are executed in an
+ipython shell.
+
+
+
+.. warning::
+
+    Even though possible, it is strongly discouraged to pass the password as a parameter.
+
+.. note::
+
+    -  The constructor is checking if a api description is already in the cache and will load it from
+    the gl.inet online documentation if not.
+    - Make sure you check and understand the default settings
 
 .. code:: python
 
    from pyglinet import GlInet
    glinet = GlInet()
+
+..
+
+Login
+~~~~~
+
+.. code:: python
+
    glinet.login()
 
 ..
 
-   **Info:** With the default settings, the following tasks will be
-   executed during init and login:
+.. note::
 
-   -  try to load api reference from persistence, otherwise load it from
-      the gl.inet online documentation
-   -  if no password is passed as parameter in the constructor
-   -  try to load from persistence (password stored as hash)
-   -  if no success ask via prompt
-   -  persist settings
+   -  if no password is passed as parameter in the constructor, ``login()`` will try to load login data from persistence
+   -  if no success ask via prompt and persist settings
    -  start background thread to keep connection alive
 
 API Access Via Dynamically Created Client
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-First generate an api object.
+Make sure you are in an ipython shell and logged in. Then, generate the ``api_client``.
 
 .. code:: python
 
@@ -312,7 +319,7 @@ The API json responses are recursively converted into objects. This
 provides convenient access with code completion and point access to the
 data.
 
-API Access Via Manual Requests
+API Access Via Direct Request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Instead of using the dynamically created api_client, it is also possible
@@ -348,8 +355,10 @@ is equivalent to
 
 ..
 
-   **Note:** the output of the ``request`` method returns the whole
-   response body whereas the api_client just returns the result.
+.. note::
+
+   The output of the ``request`` method returns the whole
+   response body whereas the api_client just returns the result dict.
 
 
 Roadmap
@@ -364,14 +373,14 @@ V1.0.0
 -  ☒ Publish pip package
 -  ☒ Add tests
 -  ☒ Improve documentation
--  ☐ Increase test coverage
+-  ☒ Increase test coverage
 -  ☐ replace crypt dependency to allow also Windows execution
+-  ☐ Add wrapper for execution via terminal
 
 
 V2.0.0
 ~~~~~~
-
--  ☐ Add wrapper for execution via terminal
+-  ☐ Add asyncio support
 -  ☐ ...
 
 .. |GitHub Workflow Status (event)| image:: https://img.shields.io/github/workflow/status/tomtana/python-glinet/Python%20package
