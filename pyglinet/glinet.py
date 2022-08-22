@@ -59,7 +59,7 @@ class GlInet:
         self._query_id = 0
         if cache_folder is None:
             self._cache_folder = pathlib.Path.home()
-            self._cache_folder = os.path.join(self._cache_folder, ".python-pyglinet")
+            self._cache_folder = os.path.join(self._cache_folder, ".python-glinet")
             logging.info(f"Creating folder {self._cache_folder} if not exist")
             pathlib.Path(self._cache_folder).mkdir(exist_ok=True)
         else:
