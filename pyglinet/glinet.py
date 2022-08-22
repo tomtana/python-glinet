@@ -294,7 +294,7 @@ class GlInet:
         """
         Stop keep alive thread
         """
-        if self._thread and self._thread.is_alive():
+        if hasattr(self, "_thread") and self._thread and self._thread.is_alive():
             logging.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
             self._keep_alive_interrupt_event.set()
             self._thread.join()

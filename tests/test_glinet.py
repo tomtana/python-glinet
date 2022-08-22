@@ -41,7 +41,6 @@ def test_login_logout_caching(glinet_base):
     time.sleep(0.3)
     assert glinet_base._thread.is_alive(), "Keep alive thread not working"
     glinet_base._stop_keep_alive_thread()
-    glinet_base._thread.join()
 
     assert not glinet_base._thread.is_alive(), "Keep alive thread still running"
 
