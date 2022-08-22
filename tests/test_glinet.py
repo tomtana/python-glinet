@@ -16,11 +16,6 @@ def replace_stdin(target):
 
 
 @pytest.fixture(scope="module")
-def vcr_config():
-    return {"record_mode": "once"}
-
-
-@pytest.fixture(scope="module")
 def glinet_base():
     gl = GlInet(password=r"jdlkjLJlkd=(//&%/&dskdBBDs192837")
     yield gl
