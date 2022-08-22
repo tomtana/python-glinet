@@ -112,13 +112,20 @@ def test_api_client_01(glinet):
     # check if request and api client have same behaviour
     res1 = api_client.clients.get_status()
     res2 = glinet.request("call", ["clients", "get_status"]).result
-    assert res1 == res2, "Diverging result with same api method."
+    res3 = api_client.clients.get_status.call()
+    assert res1 == res2 == res3, "Diverging result with same api method."
 
     # read and write
     api_client.led.set_config([{"led_enable": False}])
     assert not api_client.led.get_config().led_enable, "Value has not been set"
-    api_client.led.set_config([{"led_enable": True}])
+    api_client.led.set_config.call([{"led_enable": True}])
     assert api_client.led.get_config().led_enable, "Value has not been set"
+    str(api_client.clients.get_status)
+    repr(api_client.clients.get_status)
+    str(api_client.clients)
+    repr(api_client.clients)
+    str(api_client)
+    repr(api_client)
 
 
 @pytest.mark.vcr()

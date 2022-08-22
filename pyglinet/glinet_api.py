@@ -15,7 +15,7 @@ class GlInetApiCall:
             return GlInetApiProperty(value) if isinstance(value, dict) else value
 
     def call(self, params=None):
-        self.__call__(params)
+        return self.__call__(params)
 
     @decorators.login_required
     def __call__(self, params=None):
@@ -31,7 +31,7 @@ class GlInetApiCall:
                         headers=["Parameter", "Type", "Description"])
 
     def __str__(self):
-        self.__repr__()
+        return self.__repr__()
 
 
 class GlInetApiProperty:
