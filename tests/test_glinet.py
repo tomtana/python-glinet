@@ -16,10 +16,22 @@ def replace_stdin(target):
 
 
 @pytest.fixture(scope="module")
+def vcr_config():
+    return {"record_mode": "once"}
+
+
+@pytest.fixture(scope="module")
 def glinet_base():
     gl = GlInet(password=r"jdlkjLJlkd=(//&%/&dskdBBDs192837")
     yield gl
-    gl.logout()
+    gl._stop_keep_alive_thread()
+
+
+@pytest.fixture(autouse=True)
+def glinet(glinet_base):
+    glinet_base.login()
+    time.sleep(0.3)
+    return glinet_base
 
 
 @pytest.mark.vcr()
@@ -77,13 +89,13 @@ def test_unsuccessful_login():
 
 
 @pytest.mark.vcr()
-def test_api_client_01(glinet_base):
+def test_api_client_01(glinet):
     time.sleep(0.3)
-    glinet_base.login()
-    api_client = glinet_base.get_api_client()
+    glinet.login()
+    api_client = glinet.get_api_client()
     # check if request and api client have same behaviour
     res1 = api_client.clients.get_status()
-    res2 = glinet_base.request("call", ["clients", "get_status"]).result
+    res2 = glinet.request("call", ["clients", "get_status"]).result
     assert res1 == res2, "Diverging result with same api method."
 
     # read and write
@@ -94,26 +106,25 @@ def test_api_client_01(glinet_base):
 
 
 @pytest.mark.vcr()
-def test_requests(glinet_base):
+def test_requests(glinet):
     time.sleep(0.3)
-    glinet_base.login()
-    api_client = glinet_base.get_api_client()
+    glinet.login()
+    api_client = glinet.get_api_client()
     with(pytest.raises(exceptions.LoggedInError)):
-        glinet_base.request("login", {})
-    glinet_base.logout()
+        glinet.request("login", {})
+    glinet.logout()
     with(pytest.raises(exceptions.NotLoggedInError)):
-        glinet_base.request("logout", {})
+        glinet.request("logout", {})
     with(pytest.raises(exceptions.NotLoggedInError)):
-        glinet_base.request("call", ["whatever", "is_here"])
+        glinet.request("call", ["whatever", "is_here"])
     with(pytest.raises(exceptions.NotLoggedInError)):
         api_client.led.get_config()
 
 
 @pytest.mark.vcr()
-def test_no_api_description(glinet_base):
-    glinet_base.login()
-    api_description = glinet_base._api_description
-    glinet_base._api_description = None
+def test_no_api_description(glinet):
+    api_description = glinet._api_description
+    glinet._api_description = None
     with(pytest.raises(exceptions.NoApiDescriptionError)):
-        glinet_base.get_api_client()
-    glinet_base._api_description = api_description
+        glinet.get_api_client()
+    glinet._api_description = api_description
