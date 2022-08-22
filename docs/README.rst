@@ -91,6 +91,7 @@ The login method call has deliberately not been integrated into the constructor.
 it is possible to instantiate the object and login as shown below.
 
 .. code:: python
+
    # one liner: instantiation and login
    glinet = GlInet().login()
 
@@ -111,6 +112,9 @@ Make sure you are in an ipython shell and logged in. Then, generate the ``api_cl
 
    api_client = glinet.get_api_client()
 
+You have also direct access to the api via the ``api`` property of the ``GlInet`` instance.
+
+
 General
 ^^^^^^^
 
@@ -129,6 +133,13 @@ Just call your client to see all available api function groups.
 ::
 
    api_client
+
+Or same result with
+
+::
+
+   glinet.api
+
 
 .. collapse:: Output
 
