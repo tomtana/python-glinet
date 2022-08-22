@@ -7,6 +7,7 @@ from io import StringIO
 from contextlib import contextmanager
 import pathlib
 
+
 @contextmanager
 def replace_stdin(target):
     orig = sys.stdin
@@ -17,7 +18,7 @@ def replace_stdin(target):
 
 @pytest.fixture(scope="module")
 def glinet_base():
-    gl = GlInet(password=r"jdlkjLJlkd=(//&%/&dskdBBDs192837")
+    gl = GlInet(password=r"jdlkjLJlkd=(//&%/&dskdBBDs192837", keep_alive=False)
     yield gl
     gl._stop_keep_alive_thread()
 
@@ -34,20 +35,16 @@ def test_login_logout_caching(glinet_base):
     time.sleep(0.3)
     assert glinet_base.login(), "Login was not successful"
     time.sleep(0.3)
-    assert glinet_base._thread.is_alive(), "Keep alive thread not working"
-    glinet_base._stop_keep_alive_thread()
-
-    assert not glinet_base._thread.is_alive(), "Keep alive thread still running"
 
     assert glinet_base.logout(), "Logout was not successful"
     assert not glinet_base.is_alive(), "client is still alive"
     assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
     assert os.path.exists(glinet_base._api_reference_cache_path), "Api cache file was not created."
 
-    #check if data is loaded from cache
+    # check if data is loaded from cache
     gl = GlInet()
 
-    #check if custom path is working
+    # check if custom path is working
     cache_folder = pathlib.Path.home().as_posix() + "/.python-glinet"
     pathlib.Path(cache_folder).mkdir(exist_ok=True)
     gl = GlInet(cache_folder=cache_folder)
@@ -55,11 +52,12 @@ def test_login_logout_caching(glinet_base):
         gl = GlInet(cache_folder="/doesnt_exist")
 
 
-
 @pytest.mark.vcr()
 def test_keep_alive(glinet_base):
     time.sleep(0.3)
+    glinet_base._keep_alive = True
     assert glinet_base.login(), "Login was not successful"
+    glinet_base._start_keep_alive_thread()
     assert glinet_base.is_alive(), "Not logged in"
     assert glinet_base._thread.is_alive(), "Keep alive thread not working"
     with pytest.raises(exceptions.KeepAliveThreadActiveError):
@@ -67,7 +65,6 @@ def test_keep_alive(glinet_base):
     glinet_base._sid = glinet_base._sid[:-2] + "aA"
     assert not glinet_base.is_alive(), "Should not be alive but is"
     glinet_base.logout()
-    glinet_base._thread.join()
     assert not glinet_base.is_alive(), "Still logged in"
     assert not glinet_base._thread.is_alive(), "Keep alive thread still running"
     time.sleep(0.3)
@@ -78,9 +75,9 @@ def test_keep_alive(glinet_base):
     assert glinet_base._thread.is_alive(), "Keep alive thread not working"
     assert glinet_base.is_alive(), "Not logged in"
     glinet_base.logout()
-    glinet_base._thread.join()
     assert not glinet_base.is_alive(), "Still logged in"
     assert not glinet_base._thread.is_alive(), "Keep alive thread still running"
+    glinet_base._keep_alive = False
 
 
 @pytest.mark.vcr()
