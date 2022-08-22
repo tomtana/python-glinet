@@ -100,7 +100,7 @@ Make sure you are in an ipython shell and logged in. Then, generate the ``api_cl
 
 .. code:: python
 
-   client = glinet.get_api_client()
+   api_client = glinet.get_api_client()
 
 General
 ^^^^^^^
@@ -119,7 +119,7 @@ Just call your client to see all available api function groups.
 
 ::
 
-   client
+   api_client
 
 .. collapse:: Output
 
@@ -182,7 +182,7 @@ enter.
 
 .. code:: python
 
-   client.wg_client
+   api_client.wg_client
 
 .. collapse:: Output
 
@@ -223,7 +223,7 @@ optional.
 
 .. code:: python
 
-   api.wg_client.set_config
+   api_client.wg_client.set_config
 
 .. collapse:: Output
 
@@ -257,7 +257,7 @@ will show all the parameter and usage examples.
 
 .. code:: text
 
-   api.wg_client.set_config?
+   api_client.wg_client.set_config?
 
 .. collapse:: Output
 
@@ -301,7 +301,7 @@ how parameters need to be passed.
 
 ::
 
-   client.wg_client.get_all_config_list()
+   api_client.wg_client.get_all_config_list()
 
 .. code:: bash
 
