@@ -294,9 +294,10 @@ class GlInet:
         """
         Stop keep alive thread
         """
-        logging.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
-        self._keep_alive_interrupt_event.set()
-        self._thread.join()
+        if self._thread and self._thread.is_alive():
+            logging.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
+            self._keep_alive_interrupt_event.set()
+            self._thread.join()
 
     def __update_login_and_cache(self, challenge, update_password=False):
         """
