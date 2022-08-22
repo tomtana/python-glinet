@@ -10,7 +10,7 @@ python-glinet
 .. toctree::
    :maxdepth: 2
 
-   Documentation<readme>
+   Documentation<README>
    glinet
 
 

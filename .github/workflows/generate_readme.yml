@@ -1,0 +1,35 @@
+# Generate automaticially a markdown README from restructuredtext
+name: Generate Markdown Readme
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  # Single deploy job since we're just deploying
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Convert to Markdown
+        run: |
+          docker run --rm --volume "$(pwd):/data" --user $(id -u):$(id -g) pandoc/core docs/README.rst -o README.md
+      - name: Check in README.md
+        run: |
+          git config --global user.name 'GH Action'
+          git config --global user.email 'python@tomtana.net'
+          git add README.md
+          git commit -m "auto README.md generation"
+          git push
+
