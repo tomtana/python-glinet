@@ -24,10 +24,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Convert to Markdown
         run: |
-          docker run --rm --volume "$(pwd):/data" --user $(id -u):$(id -g) \
-          pandoc/core /bin/bash -c "sudo apt-get install python3" 
-          docker run --rm --volume "$(pwd):/data" --user $(id -u):$(id -g) \
-          pandoc/core docs/README.rst --filter docs/conversion_filter.py -o README.md
+          sudo apt-get install pandoc
+          pandoc -s --filter docs/conversion_filter.py  docs/README.rst -o README.md
       - name: Check in README.md
         run: |
           git config --global user.name 'GH Action'
