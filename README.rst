@@ -83,8 +83,8 @@ ipython shell.
 .. note::
 
     -  The constructor is checking if a api description is already in the cache and will load it from
-    the gl.inet online documentation if not.
-    - Make sure you check and understand the default settings
+the gl.inet online documentation if not.
+    -  Make sure you check and understand the default settings
 
 .. code:: python
 
