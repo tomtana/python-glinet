@@ -50,8 +50,9 @@ def test_login_logout_caching(glinet_base):
     gl = GlInet(cache_folder=cache_folder)
     with pytest.raises(FileExistsError):
         gl = GlInet(cache_folder="/doesnt_exist")
-    with replace_stdin("jdlkjLJlkd=(//&%/&dskdBBDs192837") as s:
+    with replace_stdin(StringIO("jdlkjLJlkd=(//&%/&dskdBBDs192837")) as s:
         gl = GlInet(keep_alive=False)
+        os.remove(gl._login_cache_path)
         time.sleep(0.3)
         gl.login()
         gl.logout()
