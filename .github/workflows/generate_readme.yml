@@ -22,6 +22,13 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
       - name: Convert to Markdown
         run: |
           docker run --rm --volume "$(pwd):/data" --user $(id -u):$(id -g) pandoc/core docs/README.rst --filter docs/conversion_filter.py -o README.md
