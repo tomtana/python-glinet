@@ -17,6 +17,9 @@ import pickle
 from typing import Union, List, Dict
 import shutil
 
+log = logging.getLogger(__name__)
+
+
 
 class GlInet:
     """
@@ -61,7 +64,7 @@ class GlInet:
         if cache_folder is None:
             self._cache_folder = pathlib.Path.home()
             self._cache_folder = os.path.join(self._cache_folder, ".python-glinet")
-            logging.info(f"Creating folder {self._cache_folder} if not exist")
+            log.info(f"Creating folder {self._cache_folder} if not exist")
             pathlib.Path(self._cache_folder).mkdir(exist_ok=True)
         else:
             if os.path.exists(cache_folder):
@@ -79,7 +82,7 @@ class GlInet:
         self._lock = threading.Lock()
         self._verify_ssl_certificate = verify_ssl_certificate
         if self._verify_ssl_certificate is False:
-            logging.warning("You disabled ssl certificate validation. Further warning messages will be deactivated.")
+            log.warning("You disabled ssl certificate validation. Further warning messages will be deactivated.")
             warnings.filterwarnings('ignore', message='Unverified HTTPS request')
         self._cached_login_data = None
         self._login_cache_path = os.path.join(self._cache_folder, "login.pkl")
@@ -247,7 +250,7 @@ class GlInet:
         """
 
         if self.is_alive():
-            logging.info("Already logged in, nothing to do.")
+            log.info("Already logged in, nothing to do.")
             return self
 
         challenge = self.__challenge_login()
@@ -266,7 +269,7 @@ class GlInet:
                                           "hash": login_hash})
             self._sid = resp.result.sid
         except exceptions.AccessDeniedError:
-            logging.warning("Could not login with current credentials, deleting cached credentials.")
+            log.warning("Could not login with current credentials, deleting cached credentials.")
             self._cached_login_data = None
             self._sid = None
             os.remove(self._login_cache_path)
@@ -286,7 +289,7 @@ class GlInet:
         :return:
         """
         if self._thread is None or not self._thread.is_alive():
-            logging.debug("Starting background keep alive thread.")
+            log.debug("Starting background keep alive thread.")
             self._keep_alive_interrupt_event.clear()
             self._thread = threading.Thread(target=self.__keep_alive)
             self._thread.start()
@@ -298,7 +301,7 @@ class GlInet:
         Stop keep alive thread
         """
         if hasattr(self, "_thread") and self._thread and self._thread.is_alive():
-            logging.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
+            log.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
             self._keep_alive_interrupt_event.set()
             self._thread.join()
 
@@ -338,7 +341,7 @@ class GlInet:
                 try:
                     loaded_data = pickle.load(f)
                 except:
-                    logging.warning(f"Something went wrong loading file {file}")
+                    log.warning(f"Something went wrong loading file {file}")
         return loaded_data
 
     def __dump_to_file(self, obj, file):
@@ -365,14 +368,14 @@ class GlInet:
 
         :return: None
         """
-        logging.info(f"Starting keep alive thread at intvervall {self._keep_alive_intervall}")
+        log.info(f"Starting keep alive thread at intvervall {self._keep_alive_intervall}")
         while self._keep_alive and not self._keep_alive_interrupt_event.is_set():
-            logging.debug(f"keep alive with intervall {self._keep_alive_intervall}")
+            log.debug(f"keep alive with intervall {self._keep_alive_intervall}")
             if not self.is_alive():
-                logging.warning("client disconnected, trying to login again..")
+                log.warning("client disconnected, trying to login again..")
                 self.login()
             self._keep_alive_interrupt_event.wait(self._keep_alive_intervall)
-        logging.info("Keep alive halted.")
+        log.info("Keep alive halted.")
 
     def flush_cache(self) -> None:
         """
@@ -384,6 +387,7 @@ class GlInet:
         if os.path.exists(self._cache_folder):
             shutil.rmtree(self._cache_folder)
         self._cached_login_data = None
+        log.info(f"Login cache cleared and folder {self._cache_folder} deleted")
 
     def is_alive(self) -> bool:
         """
@@ -444,13 +448,13 @@ class GlInet:
         """
         api_description = None
         if update or not os.path.exists(self._api_reference_cache_path):
-            logging.info(f"Loading api description from {self._api_reference_url}")
+            log.info(f"Loading api description from {self._api_reference_url}")
             resp = requests.get(self._api_reference_url)
             api_description = resp.json()["data"]
             api_description = {utils.sanitize_string(i["module_name"][0]): i for i in api_description}
             pathlib.Path(self._cache_folder).mkdir(exist_ok=True)
             with open(self._api_reference_cache_path, "wb") as f:
-                logging.info(f"Updating cache file {self._api_reference_cache_path}")
+                log.info(f"Updating cache file {self._api_reference_cache_path}")
                 pickle.dump(api_description, f)
         else:
             with open(self._api_reference_cache_path, "rb") as f:
@@ -481,5 +485,4 @@ class GlInet:
 
         :return: GlInetApi
         """
-
         return self.get_api_client()
