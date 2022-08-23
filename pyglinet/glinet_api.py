@@ -14,9 +14,6 @@ class GlInetApiCall:
         else:
             return GlInetApiProperty(value) if isinstance(value, dict) else value
 
-    def call(self, params=None):
-        return self.__call__(params)
-
     @decorators.login_required
     def __call__(self, params=None):
 

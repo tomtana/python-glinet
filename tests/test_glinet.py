@@ -112,9 +112,8 @@ def test_api_client_01(glinet):
     # check if request and api client have same behaviour
     res1 = api_client.clients.get_status()
     res2 = glinet.request("call", ["clients", "get_status"]).result
-    res3 = api_client.clients.get_status.call()
     res4 = glinet.api.clients.get_status()
-    assert res1 == res2 == res3 == res4, "Diverging result with same api method."
+    assert res1 == res2 == res4, "Diverging result with same api method."
 
     #test str and repr from ResultContainer
     str(res1)
@@ -123,7 +122,6 @@ def test_api_client_01(glinet):
     # read and write
     api_client.led.set_config([{"led_enable": False}])
     assert not api_client.led.get_config().led_enable, "Value has not been set"
-    api_client.led.set_config.call([{"led_enable": True}])
     assert api_client.led.get_config().led_enable, "Value has not been set"
     str(api_client.clients.get_status)
     repr(api_client.clients.get_status)
