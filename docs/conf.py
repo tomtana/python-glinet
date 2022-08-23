@@ -18,7 +18,6 @@ extensions = ['myst_parser', 'sphinx.ext.autodoc', 'sphinx_toolbox.collapse']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-autodoc_member_order = 'groupwise'
 autoclass_content = 'both'
 
 
