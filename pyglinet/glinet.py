@@ -15,6 +15,7 @@ import pyglinet.glinet_api as api_helper
 import pathlib
 import pickle
 from typing import Union, List, Dict
+import shutil
 
 
 class GlInet:
@@ -85,8 +86,8 @@ class GlInet:
         self._api_reference_cache_path = os.path.join(self._cache_folder, "api_reference.pkl")
         self._api_reference_url = api_reference_url
         self._api_description = self.__load_api_description(update_api_reference_cache)
-        self._keep_alive_interrupt_event = threading.Event()
         self._api = None
+        self._keep_alive_interrupt_event = threading.Event()
 
     def __del__(self):
         self._stop_keep_alive_thread()
@@ -349,6 +350,9 @@ class GlInet:
 
         :return: None
         """
+        if not pathlib.Path(file).parent.exists():
+            pathlib.Path(file).parent.mkdir(exist_ok=True)
+
         with open(file, "wb") as f:
             pickle.dump(obj, f)
 
@@ -369,6 +373,17 @@ class GlInet:
                 self.login()
             self._keep_alive_interrupt_event.wait(self._keep_alive_intervall)
         logging.info("Keep alive halted.")
+
+    def flush_cache(self) -> None:
+        """
+        Deletes the folder containing persisted login and api description as well as cached login data.
+        It will NOT invalidate or reload api data. To achieve that call :meth:`~pyglinet.GlInet.get_apt_client(True)`
+
+        :return: None
+        """
+        if os.path.exists(self._cache_folder):
+            shutil.rmtree(self._cache_folder)
+        self._cached_login_data = None
 
     def is_alive(self) -> bool:
         """
@@ -433,6 +448,7 @@ class GlInet:
             resp = requests.get(self._api_reference_url)
             api_description = resp.json()["data"]
             api_description = {utils.sanitize_string(i["module_name"][0]): i for i in api_description}
+            pathlib.Path(self._cache_folder).mkdir(exist_ok=True)
             with open(self._api_reference_cache_path, "wb") as f:
                 logging.info(f"Updating cache file {self._api_reference_cache_path}")
                 pickle.dump(api_description, f)
@@ -443,16 +459,20 @@ class GlInet:
         return api_description
 
     @decorators.login_required
-    def get_api_client(self) -> api_helper.GlInetApi:
+    def get_api_client(self, update_description=False) -> api_helper.GlInetApi:
         """
         Create GlInetApi object client to access api functions
 
-        :return: api client
+        :param update_description: if True, api description is updated from web
+        :return: GlInetApi
         """
-        if self._api_description:
-            return api_helper.GlInetApi(self._api_description, self)
-        else:
-            raise exceptions.NoApiDescriptionError("Api description is not loaded.")
+        if not self._api_description or update_description:
+            self._api_description = self.__load_api_description(True)
+            self._api = api_helper.GlInetApi(self._api_description, self)
+        if not self._api:
+            self._api = api_helper.GlInetApi(self._api_description, self)
+
+        return self._api
 
     @property
     def api(self) -> api_helper.GlInetApi:
@@ -461,6 +481,5 @@ class GlInet:
 
         :return: GlInetApi
         """
-        if not self._api:
-            self._api = self.get_api_client()
-        return self._api
+
+        return self.get_api_client()

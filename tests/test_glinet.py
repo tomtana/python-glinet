@@ -17,6 +17,12 @@ def replace_stdin(target):
 
 
 @pytest.fixture(scope="module")
+def clean_cache():
+    gl = GlInet()
+    gl.flush_cache()
+
+
+@pytest.fixture(scope="module")
 def glinet_base():
     gl = GlInet(password=r"jdlkjLJlkd=(//&%/&dskdBBDs192837", keep_alive=False)
     yield gl
@@ -36,10 +42,24 @@ def test_login_logout_caching(glinet_base):
     assert glinet_base.login(), "Login was not successful"
     time.sleep(0.3)
 
+    glinet_base.flush_cache()
+    assert not os.path.exists(glinet_base._cache_folder), "Cache folder was not deleted"
+    api_client1 = glinet_base.get_api_client()
+    api_client2 = glinet_base.api
+    assert api_client2 == api_client1, "Clients should be the same"
+    api_client3 = glinet_base.get_api_client(True)
+    assert api_client1 == api_client2 != api_client3, "api_client3 should be different from api_client1 and api_client2"
+    glinet_base.logout()
+
+    time.sleep(0.3)
+    glinet_base.login()
+    time.sleep(0.3)
     assert glinet_base.logout(), "Logout was not successful"
     assert not glinet_base.is_alive(), "client is still alive"
     assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
     assert os.path.exists(glinet_base._api_reference_cache_path), "Api cache file was not created."
+
+
 
     # check if data is loaded from cache
     gl = GlInet()
@@ -115,13 +135,14 @@ def test_api_client_01(glinet):
     res4 = glinet.api.clients.get_status()
     assert res1 == res2 == res4, "Diverging result with same api method."
 
-    #test str and repr from ResultContainer
+    # test str and repr from ResultContainer
     str(res1)
     repr(res1)
 
     # read and write
     api_client.led.set_config([{"led_enable": False}])
     assert not api_client.led.get_config().led_enable, "Value has not been set"
+    api_client.led.set_config([{"led_enable": True}])
     assert api_client.led.get_config().led_enable, "Value has not been set"
     str(api_client.clients.get_status)
     repr(api_client.clients.get_status)
@@ -150,11 +171,3 @@ def test_requests(glinet):
     with(pytest.raises(exceptions.NotLoggedInError)):
         api_client.led.get_config()
 
-
-@pytest.mark.vcr()
-def test_no_api_description(glinet):
-    api_description = glinet._api_description
-    glinet._api_description = None
-    with(pytest.raises(exceptions.NoApiDescriptionError)):
-        glinet.get_api_client()
-    glinet._api_description = api_description
