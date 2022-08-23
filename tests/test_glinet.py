@@ -43,6 +43,9 @@ def test_login_logout_caching(glinet_base):
     time.sleep(0.3)
 
     glinet_base.flush_cache()
+    glinet_base._GlInet__dump_to_file("test1234", glinet_base._login_cache_path)
+    assert os.path.exists(glinet_base._login_cache_path)
+    glinet_base.flush_cache()
     assert not os.path.exists(glinet_base._cache_folder), "Cache folder was not deleted"
     api_client1 = glinet_base.get_api_client()
     api_client2 = glinet_base.api
