@@ -144,6 +144,8 @@ def test_api_client_01(glinet):
     assert not api_client.led.get_config().led_enable, "Value has not been set"
     api_client.led.set_config([{"led_enable": True}])
     assert api_client.led.get_config().led_enable, "Value has not been set"
+    str(glinet.api.led.set_config.data)
+    repr(glinet.api.led.set_config.data)
     str(api_client.clients.get_status)
     repr(api_client.clients.get_status)
     str(api_client.clients)
