@@ -6,12 +6,10 @@ name: Code Coverage
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
-
+    name: code_coverage
     runs-on: ubuntu-latest
 
     steps:
