@@ -28,6 +28,6 @@ class KeepAliveThreadActiveError(Exception):
         super().__init__(*args, **kwargs)
 
 
-class NoApiDescriptionError(Exception):
+class WrongApiDescriptionError(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

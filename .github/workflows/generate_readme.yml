@@ -18,6 +18,7 @@ permissions:
 jobs:
   # Single deploy job since we're just deploying
   build:
+    name: build_readme
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository

@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-
+    name: code_coverage
     runs-on: ubuntu-latest
 
     steps:

@@ -1,6 +1,7 @@
 import time
 import pytest
 from pyglinet import GlInet, exceptions
+import pyglinet.glinet_api as glinet_api
 import os
 import sys
 from io import StringIO
@@ -61,8 +62,6 @@ def test_login_logout_caching(glinet_base):
     assert not glinet_base.is_alive(), "client is still alive"
     assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
     assert os.path.exists(glinet_base._api_reference_cache_path), "Api cache file was not created."
-
-
 
     # check if data is loaded from cache
     gl = GlInet()
@@ -147,6 +146,10 @@ def test_api_client_01(glinet):
     assert not api_client.led.get_config().led_enable, "Value has not been set"
     api_client.led.set_config([{"led_enable": True}])
     assert api_client.led.get_config().led_enable, "Value has not been set"
+    with(pytest.raises(exceptions.WrongApiDescriptionError)):
+        glinet_api.GlInetApi([{"test_0": [{"test_1": [{"test_2"}]}]}], glinet._session)
+    with(pytest.raises(exceptions.WrongApiDescriptionError)):
+        glinet_api.GlInetApi({"test_0": [{"test_1": [{"test_2"}]}]}, glinet._session)
     str(glinet.api.led.set_config.data)
     repr(glinet.api.led.set_config.data)
     str(api_client.clients.get_status)

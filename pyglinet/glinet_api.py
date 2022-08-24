@@ -1,8 +1,11 @@
 from tabulate import tabulate
 import pyglinet.decorators as decorators
+import requests
+import pyglinet.exceptions as exceptions
+
 
 class GlInetApiCall:
-    def __init__(self, data, session):
+    def __init__(self, data: dict, session):
         self._session = session
         for name, value in data.items():
             setattr(self, name, self._wrap(value))
@@ -32,7 +35,7 @@ class GlInetApiCall:
 
 
 class GlInetApiProperty:
-    def __init__(self, data):
+    def __init__(self, data: dict):
         for name, value in data.items():
             setattr(self, name, self._wrap(value))
 
@@ -40,7 +43,7 @@ class GlInetApiProperty:
         if isinstance(value, (tuple, list, set, frozenset)):
             return type(value)([self._wrap(v) for v in value])
         else:
-            return GlInetApiProperty(value, self._session) if isinstance(value, dict) else value
+            return GlInetApiProperty(value) if isinstance(value, dict) else value
 
     def __repr__(self):
         return str(self.__dict__)
@@ -50,20 +53,19 @@ class GlInetApiProperty:
 
 
 class GlInetApi:
-    def __init__(self, data, session):
+    def __init__(self, data: dict, session: requests.Session):
         self._session = session
-        if data.get("case_groups_data", None):
+        if isinstance(data, dict) and data.get("case_groups_data", None):
             for name, value in data.get("case_groups_data").items():
                 setattr(self, name, GlInetApiCall(value, self._session))
-        else:
+        elif isinstance(data, dict):
             for name, value in data.items():
                 setattr(self, name, self._wrap(value))
+        else:
+            raise exceptions.WrongApiDescriptionError(f"Api description has no valid format:\n {data}")
 
     def _wrap(self, value):
-        if isinstance(value, (tuple, list, set, frozenset)):
-            return type(value)([self._wrap(v) for v in value])
-        else:
-            return GlInetApi(value, self._session) if isinstance(value, dict) else value
+        return GlInetApi(value, self._session)
 
     def __repr__(self):
         return tabulate([[i] for i in list(self.__dict__.keys()) if not i.startswith("_")], headers=["Function"])

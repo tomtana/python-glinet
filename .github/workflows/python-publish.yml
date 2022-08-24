@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   deploy:
-
+    name: publish_pip
     runs-on: ubuntu-latest
 
     steps:
