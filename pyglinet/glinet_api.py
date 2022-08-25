@@ -2,7 +2,7 @@ from tabulate import tabulate
 import pyglinet.decorators as decorators
 import requests
 import pyglinet.exceptions as exceptions
-
+from typing import Union, List, Dict
 
 class GlInetApiCall:
     def __init__(self, data: dict, session):
@@ -18,11 +18,11 @@ class GlInetApiCall:
             return GlInetApiProperty(value) if isinstance(value, dict) else value
 
     @decorators.login_required
-    def __call__(self, params=None):
+    def __call__(self, params:Union[str, Dict, List, None]=None):
 
         p = []
-        if params:
-            p = list(params)
+        if params and not isinstance(params, list):
+            p = [params]
         p = self.module_name + [self.data.title] + p
         return self._session.request("call", p).result
 
