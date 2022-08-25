@@ -144,7 +144,7 @@ def test_api_client_01(glinet):
     # read and write
     api_client.led.set_config([{"led_enable": False}])
     assert not api_client.led.get_config().led_enable, "Value has not been set"
-    api_client.led.set_config([{"led_enable": True}])
+    api_client.led.set_config({"led_enable": True})
     assert api_client.led.get_config().led_enable, "Value has not been set"
     with(pytest.raises(exceptions.WrongApiDescriptionError)):
         glinet_api.GlInetApi([{"test_0": [{"test_1": [{"test_2"}]}]}], glinet._session)
