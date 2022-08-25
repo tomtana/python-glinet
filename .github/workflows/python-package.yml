@@ -13,6 +13,7 @@ jobs:
   build:
     name: python_tests
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
