@@ -180,3 +180,7 @@ def test_requests(glinet):
     with(pytest.raises(exceptions.NotLoggedInError)):
         api_client.led.get_config()
 
+
+def test_unix_crypt(glinet):
+    with pytest.raises(exceptions.UnsupportedHashAlgoError):
+        glinet._GlInet__generate_unix_passwd_hash("password", "2", "salt")

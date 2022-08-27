@@ -27,6 +27,6 @@ setuptools.setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
     ],
     python_requires=">=3.6",
-    install_requires=["ipython", "tabulate", "requests"],
+    install_requires=["ipython", "tabulate", "requests", "passlib"],
     packages=setuptools.find_packages()
 )

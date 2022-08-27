@@ -31,3 +31,8 @@ class KeepAliveThreadActiveError(Exception):
 class WrongApiDescriptionError(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+class UnsupportedHashAlgoError(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
