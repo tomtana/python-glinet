@@ -4,6 +4,7 @@ import requests
 import pyglinet.exceptions as exceptions
 from typing import Union, List, Dict
 
+
 class GlInetApiCall:
     def __init__(self, data: dict, session):
         self._session = session
@@ -17,12 +18,13 @@ class GlInetApiCall:
         else:
             return GlInetApiProperty(value) if isinstance(value, dict) else value
 
-    @decorators.login_required
-    def __call__(self, params:Union[str, Dict, List, None]=None):
+    def __call__(self, params: Union[Dict, List, None] = None):
 
         p = []
-        if params and not isinstance(params, list):
+        if params and isinstance(params, dict):
             p = [params]
+        elif params and isinstance(params, list):
+            p = params
         p = self.module_name + [self.data.title] + p
         return self._session.request("call", p).result
 
