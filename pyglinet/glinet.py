@@ -432,8 +432,6 @@ class GlInet:
 
         :return: hash
         """
-
-        #return crypt.crypt(password, f"${alg}${salt}")
         hash_func = self._algo_map.get(f"{alg}", None)
         if not hash_func:
             raise exceptions.UnsupportedHashAlgoError(f"The algo {alg} is not supported. Supported Algos: {self._algo_map}")
