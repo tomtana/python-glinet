@@ -365,7 +365,7 @@ Roadmap
 -   ☒ Add tests
 -   ☒ Improve documentation
 -   ☒ Increase test coverage
--   ☐ replace crypt dependency to allow also Windows execution
+-   ☒ replace crypt dependency to allow also Windows execution
 -   ☐ Add wrapper for execution via terminal
 
 ### V2.0.0
