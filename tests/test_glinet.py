@@ -30,13 +30,6 @@ def glinet_base():
     gl._stop_keep_alive_thread()
 
 
-@pytest.fixture(autouse=True)
-def glinet(glinet_base):
-    glinet_base.login()
-    time.sleep(0.3)
-    return glinet_base
-
-
 @pytest.mark.vcr()
 def test_login_logout_caching(glinet_base):
     time.sleep(0.3)
@@ -88,8 +81,8 @@ def test_login_logout_caching(glinet_base):
 @pytest.mark.vcr()
 def test_keep_alive(glinet_base):
     time.sleep(0.3)
-    glinet_base._keep_alive = True
     assert glinet_base.login(), "Login was not successful"
+    glinet_base._keep_alive = True
     glinet_base._start_keep_alive_thread()
     assert glinet_base.is_alive(), "Not logged in"
     assert glinet_base._thread.is_alive(), "Keep alive thread not working"
@@ -128,14 +121,14 @@ def test_unsuccessful_login():
 
 
 @pytest.mark.vcr()
-def test_api_client_01(glinet):
+def test_api_client_01(glinet_base):
     time.sleep(0.3)
-    glinet.login()
-    api_client = glinet.get_api_client()
+    glinet_base.login()
+    api_client = glinet_base.get_api_client()
     # check if request and api client have same behaviour
     res1 = api_client.clients.get_status()
-    res2 = glinet.request("call", ["clients", "get_status"]).result
-    res4 = glinet.api.clients.get_status()
+    res2 = glinet_base.request("call", ["clients", "get_status"]).result
+    res4 = glinet_base.api.clients.get_status()
     assert res1 == res2 == res4, "Diverging result with same api method."
 
     # test str and repr from ResultContainer
@@ -148,11 +141,11 @@ def test_api_client_01(glinet):
     api_client.led.set_config({"led_enable": True})
     assert api_client.led.get_config().led_enable, "Value has not been set"
     with(pytest.raises(exceptions.WrongApiDescriptionError)):
-        glinet_api.GlInetApi([{"test_0": [{"test_1": [{"test_2"}]}]}], glinet._session)
+        glinet_api.GlInetApi([{"test_0": [{"test_1": [{"test_2"}]}]}], glinet_base._session)
     with(pytest.raises(exceptions.WrongApiDescriptionError)):
-        glinet_api.GlInetApi({"test_0": [{"test_1": [{"test_2"}]}]}, glinet._session)
-    str(glinet.api.led.set_config.data)
-    repr(glinet.api.led.set_config.data)
+        glinet_api.GlInetApi({"test_0": [{"test_1": [{"test_2"}]}]}, glinet_base._session)
+    str(glinet_base.api.led.set_config.data)
+    repr(glinet_base.api.led.set_config.data)
     str(api_client.clients.get_status)
     repr(api_client.clients.get_status)
     str(api_client.clients)
@@ -162,25 +155,25 @@ def test_api_client_01(glinet):
 
 
 @pytest.mark.vcr()
-def test_requests(glinet):
+def test_requests(glinet_base):
     time.sleep(0.3)
-    glinet.login()
-    api_client = glinet.get_api_client()
+    glinet_base.login()
+    api_client = glinet_base.get_api_client()
     with(pytest.raises(exceptions.LoggedInError)):
-        glinet.request("login", {})
+        glinet_base.request("login", {})
     with pytest.raises(exceptions.WrongParametersError):
-        glinet.request("call", ["wrong_parameter"])
+        glinet_base.request("call", ["wrong_parameter"])
     with pytest.raises(exceptions.MethodNotFoundError):
-        glinet.request("call", ["led", "wrong_method"])
-    glinet.logout()
+        glinet_base.request("call", ["led", "wrong_method"])
+    glinet_base.logout()
     with(pytest.raises(exceptions.NotLoggedInError)):
-        glinet.request("logout", {})
+        glinet_base.request("logout", {})
     with(pytest.raises(exceptions.NotLoggedInError)):
-        glinet.request("call", ["whatever", "is_here"])
+        glinet_base.request("call", ["whatever", "is_here"])
     with(pytest.raises(exceptions.NotLoggedInError)):
         api_client.led.get_config()
 
 
-def test_unix_crypt(glinet):
+def test_unix_crypt(glinet_base):
     with pytest.raises(exceptions.UnsupportedHashAlgoError):
-        glinet._GlInet__generate_unix_passwd_hash("password", "2", "salt")
+        glinet_base._GlInet__generate_unix_passwd_hash("password", "2", "salt")

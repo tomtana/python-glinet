@@ -1,5 +1,42 @@
 interactions:
 - request:
+    body: '{"jsonrpc": "2.0", "id": 16, "method": "challenge", "params": {"username":
+      "root"}}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '83'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.28.1
+    method: POST
+    uri: https://192.168.8.1/rpc
+  response:
+    body:
+      string: '{"id":16,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"IDzE8plcI34BQB6IxhNPsQkwAuDRgbZg"}}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/octet-stream
+      Date:
+      - Sat, 27 Aug 2022 14:14:01 GMT
+      Server:
+      - nginx/1.17.7
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
     body: '{"jsonrpc": "2.0", "id": 17, "method": "challenge", "params": {"username":
       "root"}}'
     headers:
@@ -19,7 +56,7 @@ interactions:
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":17,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"FfFSfNW1BQ3FZQ7F2gh3W8BZvIKI0xKL"}}
+      string: '{"id":17,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"vBVSyZq2NUTgvuNxZgCwtx7X1S4AftMJ"}}
 
         '
     headers:
@@ -28,7 +65,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:58 GMT
+      - Sat, 27 Aug 2022 14:14:01 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -37,45 +74,8 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 18, "method": "challenge", "params": {"username":
-      "root"}}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate, br
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '83'
-      Content-Type:
-      - application/json
-      User-Agent:
-      - python-requests/2.28.1
-    method: POST
-    uri: https://192.168.8.1/rpc
-  response:
-    body:
-      string: '{"id":18,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"mD9QpPaXUrslFCwzccYmGxwEwPJuzmqO"}}
-
-        '
-    headers:
-      Connection:
-      - close
-      Content-Type:
-      - application/octet-stream
-      Date:
-      - Sat, 27 Aug 2022 13:50:58 GMT
-      Server:
-      - nginx/1.17.7
-      Transfer-Encoding:
-      - chunked
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"jsonrpc": "2.0", "id": 19, "method": "login", "params": {"username":
-      "root", "hash": "ca0fe9e79ac960bc00883e4f892bfde9"}}'
+    body: '{"jsonrpc": "2.0", "id": 18, "method": "login", "params": {"username":
+      "root", "hash": "c73596df0ae562a876754be3d3c51e54"}}'
     headers:
       Accept:
       - '*/*'
@@ -93,7 +93,7 @@ interactions:
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":19,"jsonrpc":"2.0","result":{"username":"root","sid":"R2Njvpba1QueuFJ38xI5WS2LicSrrX9N"}}
+      string: '{"id":18,"jsonrpc":"2.0","result":{"username":"root","sid":"VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH"}}
 
         '
     headers:
@@ -102,18 +102,18 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:58 GMT
+      - Sat, 27 Aug 2022 14:14:01 GMT
       Server:
       - nginx/1.17.7
       Set-Cookie:
-      - Admin-Token=R2Njvpba1QueuFJ38xI5WS2LicSrrX9N
+      - Admin-Token=VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH
       Transfer-Encoding:
       - chunked
     status:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 20, "method": "alive", "params": {"sid": "R2Njvpba1QueuFJ38xI5WS2LicSrrX9N"}}'
+    body: '{"jsonrpc": "2.0", "id": 19, "method": "alive", "params": {"sid": "VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH"}}'
     headers:
       Accept:
       - '*/*'
@@ -126,7 +126,45 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=R2Njvpba1QueuFJ38xI5WS2LicSrrX9N
+      - Admin-Token=VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH
+      User-Agent:
+      - python-requests/2.28.1
+    method: POST
+    uri: https://192.168.8.1/rpc
+  response:
+    body:
+      string: '{"id":19,"jsonrpc":"2.0","result":null}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/octet-stream
+      Date:
+      - Sat, 27 Aug 2022 14:14:02 GMT
+      Server:
+      - nginx/1.17.7
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"jsonrpc": "2.0", "id": 20, "method": "alive", "params": {"sid": "VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH"}}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '102'
+      Content-Type:
+      - application/json
+      Cookie:
+      - Admin-Token=VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH
       User-Agent:
       - python-requests/2.28.1
     method: POST
@@ -142,7 +180,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -151,7 +189,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 21, "method": "alive", "params": {"sid": "R2Njvpba1QueuFJ38xI5WS2LicSrrX9N"}}'
+    body: '{"jsonrpc": "2.0", "id": 21, "method": "alive", "params": {"sid": "VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH"}}'
     headers:
       Accept:
       - '*/*'
@@ -164,7 +202,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=R2Njvpba1QueuFJ38xI5WS2LicSrrX9N
+      - Admin-Token=VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH
       User-Agent:
       - python-requests/2.28.1
     method: POST
@@ -180,7 +218,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -189,7 +227,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 22, "method": "alive", "params": {"sid": "R2Njvpba1QueuFJ38xI5WS2LicSrrX9N"}}'
+    body: '{"jsonrpc": "2.0", "id": 22, "method": "alive", "params": {"sid": "VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH"}}'
     headers:
       Accept:
       - '*/*'
@@ -202,7 +240,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=R2Njvpba1QueuFJ38xI5WS2LicSrrX9N
+      - Admin-Token=VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH
       User-Agent:
       - python-requests/2.28.1
     method: POST
@@ -218,7 +256,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -227,7 +265,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 23, "method": "alive", "params": {"sid": "R2Njvpba1QueuFJ38xI5WS2LicSrrX9N"}}'
+    body: '{"jsonrpc": "2.0", "id": 23, "method": "alive", "params": {"sid": "VD0lbFP2Qnset4I2elyif0VoBZ9QZZaA"}}'
     headers:
       Accept:
       - '*/*'
@@ -240,14 +278,14 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=R2Njvpba1QueuFJ38xI5WS2LicSrrX9N
+      - Admin-Token=VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH
       User-Agent:
       - python-requests/2.28.1
     method: POST
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":23,"jsonrpc":"2.0","result":null}
+      string: '{"id":23,"jsonrpc":"2.0","error":{"message":"Access denied","code":-32000}}
 
         '
     headers:
@@ -256,7 +294,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -265,7 +303,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 24, "method": "alive", "params": {"sid": "R2Njvpba1QueuFJ38xI5WS2LicSrrX9N"}}'
+    body: '{"jsonrpc": "2.0", "id": 24, "method": "alive", "params": {"sid": "VD0lbFP2Qnset4I2elyif0VoBZ9QZZaA"}}'
     headers:
       Accept:
       - '*/*'
@@ -278,14 +316,14 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=R2Njvpba1QueuFJ38xI5WS2LicSrrX9N
+      - Admin-Token=VD0lbFP2Qnset4I2elyif0VoBZ9QZZDH
       User-Agent:
       - python-requests/2.28.1
     method: POST
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":24,"jsonrpc":"2.0","result":null}
+      string: '{"id":24,"jsonrpc":"2.0","error":{"message":"Access denied","code":-32000}}
 
         '
     headers:
@@ -294,7 +332,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -303,83 +341,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 25, "method": "alive", "params": {"sid": "R2Njvpba1QueuFJ38xI5WS2LicSrrXaA"}}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate, br
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '102'
-      Content-Type:
-      - application/json
-      Cookie:
-      - Admin-Token=R2Njvpba1QueuFJ38xI5WS2LicSrrX9N
-      User-Agent:
-      - python-requests/2.28.1
-    method: POST
-    uri: https://192.168.8.1/rpc
-  response:
-    body:
-      string: '{"id":25,"jsonrpc":"2.0","error":{"message":"Access denied","code":-32000}}
-
-        '
-    headers:
-      Connection:
-      - close
-      Content-Type:
-      - application/octet-stream
-      Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
-      Server:
-      - nginx/1.17.7
-      Transfer-Encoding:
-      - chunked
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"jsonrpc": "2.0", "id": 26, "method": "alive", "params": {"sid": "R2Njvpba1QueuFJ38xI5WS2LicSrrXaA"}}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate, br
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '102'
-      Content-Type:
-      - application/json
-      Cookie:
-      - Admin-Token=R2Njvpba1QueuFJ38xI5WS2LicSrrX9N
-      User-Agent:
-      - python-requests/2.28.1
-    method: POST
-    uri: https://192.168.8.1/rpc
-  response:
-    body:
-      string: '{"id":26,"jsonrpc":"2.0","error":{"message":"Access denied","code":-32000}}
-
-        '
-    headers:
-      Connection:
-      - close
-      Content-Type:
-      - application/octet-stream
-      Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
-      Server:
-      - nginx/1.17.7
-      Transfer-Encoding:
-      - chunked
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"jsonrpc": "2.0", "id": 27, "method": "challenge", "params": {"username":
+    body: '{"jsonrpc": "2.0", "id": 25, "method": "challenge", "params": {"username":
       "root"}}'
     headers:
       Accept:
@@ -398,7 +360,7 @@ interactions:
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":27,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"Q5kdFhrj25Fw0Qo45Nl2azrSdjWaU3oU"}}
+      string: '{"id":25,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"pyUk3nKk9Wo49no6KmWQyFseMI15LQED"}}
 
         '
     headers:
@@ -407,7 +369,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -416,7 +378,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 28, "method": "challenge", "params": {"username":
+    body: '{"jsonrpc": "2.0", "id": 26, "method": "challenge", "params": {"username":
       "root"}}'
     headers:
       Accept:
@@ -435,7 +397,7 @@ interactions:
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":28,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"mTLavNLfjpExjpAE17qVKptgopA1FbIW"}}
+      string: '{"id":26,"jsonrpc":"2.0","result":{"salt":"37784Ahz","alg":1,"nonce":"Vk67JiRFTQZD3EL04LPRkeUwJ1uTbIm5"}}
 
         '
     headers:
@@ -444,7 +406,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -453,8 +415,8 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 29, "method": "login", "params": {"username":
-      "root", "hash": "977ba77ce25c7060d1e7dea605d867c3"}}'
+    body: '{"jsonrpc": "2.0", "id": 27, "method": "login", "params": {"username":
+      "root", "hash": "6219da641c626699175965f16f184a3a"}}'
     headers:
       Accept:
       - '*/*'
@@ -472,7 +434,7 @@ interactions:
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":29,"jsonrpc":"2.0","result":{"username":"root","sid":"cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL"}}
+      string: '{"id":27,"jsonrpc":"2.0","result":{"username":"root","sid":"HFob55d8ldqG0lJJoafkznhQhYjozcSs"}}
 
         '
     headers:
@@ -481,18 +443,18 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Set-Cookie:
-      - Admin-Token=cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL
+      - Admin-Token=HFob55d8ldqG0lJJoafkznhQhYjozcSs
       Transfer-Encoding:
       - chunked
     status:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 30, "method": "alive", "params": {"sid": "cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL"}}'
+    body: '{"jsonrpc": "2.0", "id": 28, "method": "alive", "params": {"sid": "HFob55d8ldqG0lJJoafkznhQhYjozcSs"}}'
     headers:
       Accept:
       - '*/*'
@@ -505,7 +467,83 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL
+      - Admin-Token=HFob55d8ldqG0lJJoafkznhQhYjozcSs
+      User-Agent:
+      - python-requests/2.28.1
+    method: POST
+    uri: https://192.168.8.1/rpc
+  response:
+    body:
+      string: '{"id":28,"jsonrpc":"2.0","result":null}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/octet-stream
+      Date:
+      - Sat, 27 Aug 2022 14:14:02 GMT
+      Server:
+      - nginx/1.17.7
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"jsonrpc": "2.0", "id": 29, "method": "alive", "params": {"sid": "HFob55d8ldqG0lJJoafkznhQhYjozcSs"}}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '102'
+      Content-Type:
+      - application/json
+      Cookie:
+      - Admin-Token=HFob55d8ldqG0lJJoafkznhQhYjozcSs
+      User-Agent:
+      - python-requests/2.28.1
+    method: POST
+    uri: https://192.168.8.1/rpc
+  response:
+    body:
+      string: '{"id":29,"jsonrpc":"2.0","result":null}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/octet-stream
+      Date:
+      - Sat, 27 Aug 2022 14:14:02 GMT
+      Server:
+      - nginx/1.17.7
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"jsonrpc": "2.0", "id": 30, "method": "alive", "params": {"sid": "HFob55d8ldqG0lJJoafkznhQhYjozcSs"}}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '102'
+      Content-Type:
+      - application/json
+      Cookie:
+      - Admin-Token=HFob55d8ldqG0lJJoafkznhQhYjozcSs
       User-Agent:
       - python-requests/2.28.1
     method: POST
@@ -521,7 +559,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -530,7 +568,8 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 31, "method": "alive", "params": {"sid": "cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL"}}'
+    body: '{"jsonrpc": "2.0", "id": 31, "method": "call", "params": ["HFob55d8ldqG0lJJoafkznhQhYjozcSs",
+      "non_existent", "parameter"]}'
     headers:
       Accept:
       - '*/*'
@@ -539,18 +578,18 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '102'
+      - '123'
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL
+      - Admin-Token=HFob55d8ldqG0lJJoafkznhQhYjozcSs
       User-Agent:
       - python-requests/2.28.1
     method: POST
     uri: https://192.168.8.1/rpc
   response:
     body:
-      string: '{"id":31,"jsonrpc":"2.0","result":null}
+      string: '{"id":31,"jsonrpc":"2.0","error":{"message":"Method not found","code":-32601}}
 
         '
     headers:
@@ -559,7 +598,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:50:59 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -568,7 +607,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 32, "method": "alive", "params": {"sid": "cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL"}}'
+    body: '{"jsonrpc": "2.0", "id": 32, "method": "alive", "params": {"sid": "HFob55d8ldqG0lJJoafkznhQhYjozcSs"}}'
     headers:
       Accept:
       - '*/*'
@@ -581,7 +620,7 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL
+      - Admin-Token=HFob55d8ldqG0lJJoafkznhQhYjozcSs
       User-Agent:
       - python-requests/2.28.1
     method: POST
@@ -597,7 +636,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:51:00 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -606,46 +645,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 33, "method": "call", "params": ["cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL",
-      "non_existent", "parameter"]}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate, br
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '123'
-      Content-Type:
-      - application/json
-      Cookie:
-      - Admin-Token=cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL
-      User-Agent:
-      - python-requests/2.28.1
-    method: POST
-    uri: https://192.168.8.1/rpc
-  response:
-    body:
-      string: '{"id":33,"jsonrpc":"2.0","error":{"message":"Method not found","code":-32601}}
-
-        '
-    headers:
-      Connection:
-      - close
-      Content-Type:
-      - application/octet-stream
-      Date:
-      - Sat, 27 Aug 2022 13:51:00 GMT
-      Server:
-      - nginx/1.17.7
-      Transfer-Encoding:
-      - chunked
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"jsonrpc": "2.0", "id": 34, "method": "alive", "params": {"sid": "cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL"}}'
+    body: '{"jsonrpc": "2.0", "id": 33, "method": "alive", "params": {"sid": "HFob55d8ldqG0lJJoafkznhQhYjozcSs"}}'
     headers:
       Accept:
       - '*/*'
@@ -658,7 +658,45 @@ interactions:
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL
+      - Admin-Token=HFob55d8ldqG0lJJoafkznhQhYjozcSs
+      User-Agent:
+      - python-requests/2.28.1
+    method: POST
+    uri: https://192.168.8.1/rpc
+  response:
+    body:
+      string: '{"id":33,"jsonrpc":"2.0","result":null}
+
+        '
+    headers:
+      Connection:
+      - close
+      Content-Type:
+      - application/octet-stream
+      Date:
+      - Sat, 27 Aug 2022 14:14:02 GMT
+      Server:
+      - nginx/1.17.7
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"jsonrpc": "2.0", "id": 34, "method": "alive", "params": {"sid": "HFob55d8ldqG0lJJoafkznhQhYjozcSs"}}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate, br
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '102'
+      Content-Type:
+      - application/json
+      Cookie:
+      - Admin-Token=HFob55d8ldqG0lJJoafkznhQhYjozcSs
       User-Agent:
       - python-requests/2.28.1
     method: POST
@@ -674,7 +712,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:51:00 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
@@ -683,7 +721,7 @@ interactions:
       code: 200
       message: OK
 - request:
-    body: '{"jsonrpc": "2.0", "id": 35, "method": "alive", "params": {"sid": "cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL"}}'
+    body: '{"jsonrpc": "2.0", "id": 35, "method": "logout", "params": {"sid": "HFob55d8ldqG0lJJoafkznhQhYjozcSs"}}'
     headers:
       Accept:
       - '*/*'
@@ -692,11 +730,11 @@ interactions:
       Connection:
       - keep-alive
       Content-Length:
-      - '102'
+      - '103'
       Content-Type:
       - application/json
       Cookie:
-      - Admin-Token=cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL
+      - Admin-Token=HFob55d8ldqG0lJJoafkznhQhYjozcSs
       User-Agent:
       - python-requests/2.28.1
     method: POST
@@ -712,83 +750,7 @@ interactions:
       Content-Type:
       - application/octet-stream
       Date:
-      - Sat, 27 Aug 2022 13:51:00 GMT
-      Server:
-      - nginx/1.17.7
-      Transfer-Encoding:
-      - chunked
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"jsonrpc": "2.0", "id": 36, "method": "alive", "params": {"sid": "cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL"}}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate, br
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '102'
-      Content-Type:
-      - application/json
-      Cookie:
-      - Admin-Token=cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL
-      User-Agent:
-      - python-requests/2.28.1
-    method: POST
-    uri: https://192.168.8.1/rpc
-  response:
-    body:
-      string: '{"id":36,"jsonrpc":"2.0","result":null}
-
-        '
-    headers:
-      Connection:
-      - close
-      Content-Type:
-      - application/octet-stream
-      Date:
-      - Sat, 27 Aug 2022 13:51:00 GMT
-      Server:
-      - nginx/1.17.7
-      Transfer-Encoding:
-      - chunked
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"jsonrpc": "2.0", "id": 37, "method": "logout", "params": {"sid": "cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL"}}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate, br
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '103'
-      Content-Type:
-      - application/json
-      Cookie:
-      - Admin-Token=cVRSbnsr1JSZU6K0QV2TibyXsLdbUUGL
-      User-Agent:
-      - python-requests/2.28.1
-    method: POST
-    uri: https://192.168.8.1/rpc
-  response:
-    body:
-      string: '{"id":37,"jsonrpc":"2.0","result":null}
-
-        '
-    headers:
-      Connection:
-      - close
-      Content-Type:
-      - application/octet-stream
-      Date:
-      - Sat, 27 Aug 2022 13:51:00 GMT
+      - Sat, 27 Aug 2022 14:14:02 GMT
       Server:
       - nginx/1.17.7
       Transfer-Encoding:
