@@ -1,9 +1,11 @@
 import time
 import os
 import requests
-import crypt
-import hashlib
+from passlib.hash import md5_crypt as md5
+from passlib.hash import sha256_crypt as sha256
+from passlib.hash import sha512_crypt as sha512
 import getpass
+import hashlib
 import pyglinet.exceptions as exceptions
 import pyglinet.decorators as decorators
 import re
@@ -20,7 +22,6 @@ import shutil
 log = logging.getLogger(__name__)
 
 
-
 class GlInet:
     """
     This class manages the connection to a GL-Inet router and provides basic routines to send and receive data.
@@ -33,6 +34,12 @@ class GlInet:
     The api calls can either be made via the GlInetApi object,
     which can be constructed via the get_api_client method, or via the request method directly.
     """
+
+    _algo_map = {
+        "1": lambda passwd, salt: md5.hash(passwd, salt=salt),
+        "5": lambda passwd, salt: sha256.hash(passwd, salt=salt, rounds=5000),
+        "6": lambda passwd, salt: sha512.hash(passwd, salt=salt, rounds=5000)
+    }
 
     def __init__(self,
                  url: str = "https://192.168.8.1/rpc",
@@ -153,6 +160,8 @@ class GlInet:
         self._lock.acquire()
         resp = self._session.post(self._url, json=req, verify=False)
         self._lock.release()
+        if resp.status_code != 200:
+            raise ConnectionError(f"Status code {resp.status_code} returned. Response content: \n\n {resp.content}")
         if resp.json().get("error", None):
             error_ = resp.json().get("error")
             if error_["code"] == -32000:
@@ -164,8 +173,6 @@ class GlInet:
                     f"Wrong method {req.get('method', None)} in request, error output: {error_}")
             else:
                 raise ConnectionError(resp.json())
-        if resp.status_code != 200:
-            raise ConnectionError(f"Status code {resp.status_code} returned. Response content: \n\n {resp.content}")
         if resp.json().get("result", None) and resp.json().get("result", None).get("err_msg", None):
             raise ConnectionError(resp.json())
         return self.__create_object(resp.json(), method, params)
@@ -425,7 +432,12 @@ class GlInet:
 
         :return: hash
         """
-        return crypt.crypt(password, f"${alg}${salt}")
+
+        #return crypt.crypt(password, f"${alg}${salt}")
+        hash_func = self._algo_map.get(f"{alg}", None)
+        if not hash_func:
+            raise exceptions.UnsupportedHashAlgoError(f"The algo {alg} is not supported. Supported Algos: {self._algo_map}")
+        return hash_func(password, salt=salt)
 
     def __generate_login_hash(self, challenge):
         """
