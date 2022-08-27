@@ -1,6 +1,6 @@
 import time
 import pytest
-from pyglinet import GlInet, exceptions
+from pyglinet import GlInet, exceptions, decorators
 import pyglinet.glinet_api as glinet_api
 import os
 import sys
@@ -53,6 +53,7 @@ def test_login_logout_caching(glinet_base):
     assert api_client2 == api_client1, "Clients should be the same"
     api_client3 = glinet_base.get_api_client(True)
     assert api_client1 == api_client2 != api_client3, "api_client3 should be different from api_client1 and api_client2"
+    assert decorators._is_alive(api_client3), "Connection is not alive"
     glinet_base.logout()
 
     time.sleep(0.3)
