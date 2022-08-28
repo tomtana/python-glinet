@@ -1,6 +1,6 @@
-Sphinx==5.1.1
-Jinja2==3.1.2
-docutils==0.17.1
-sphinx-rtd-theme==1.0.0
-myst-parser==0.18.0
-sphinx_toolbox==3.2.0
+Sphinx<=5.1.1
+Jinja2
+docutils
+sphinx-rtd-theme
+myst-parser
+sphinx_toolbox
