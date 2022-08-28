@@ -3,6 +3,11 @@ import pyglinet.decorators as decorators
 import requests
 import pyglinet.exceptions as exceptions
 from typing import Union, List, Dict
+import json
+import codecs
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class GlInetApiCall:
@@ -10,7 +15,21 @@ class GlInetApiCall:
         self._session = session
         for name, value in data.items():
             setattr(self, name, self._wrap(value))
-        self.__doc__ = f"\nAvailable parameters (?=optional):\n" + self.__repr__() + f"\n\nExample request:\n{self.in_example}\n\n" + f"\n\nExample response:\n{self.out_example}\n"
+        in_example = self.in_example
+        out_example = self.out_example
+        try:
+            in_example = json.loads(self.in_example)
+            out_example = json.loads(self.out_example)
+        except json.decoder.JSONDecodeError as e:
+            try:
+                in_example = json.loads(codecs.getdecoder("unicode_escape")(self.in_example)[0])
+                out_example = json.loads(codecs.getdecoder("unicode_escape")(self.out_example)[0])
+            except json.decoder.JSONDecodeError as e:
+                log.debug(f"Could not json decode strings. Writing using now raw ones. {self.in_example}\n{self.out_example}")
+                in_example = self.in_example
+                out_example = self.out_example
+                raise
+        self.__doc__ = f"\nAvailable parameters (?=optional):\n" + self.__repr__() + f"\n\nExample request:\n{in_example}\n\n" + f"\n\nExample response:\n{out_example}\n"
 
     def _wrap(self, value):
         if isinstance(value, (tuple, list, set, frozenset)):
