@@ -28,7 +28,6 @@ class GlInetApiCall:
                 log.debug(f"Could not json decode strings. Writing using now raw ones. {self.in_example}\n{self.out_example}")
                 in_example = self.in_example
                 out_example = self.out_example
-                raise
         self.__doc__ = f"\nAvailable parameters (?=optional):\n" + self.__repr__() + f"\n\nExample request:\n{in_example}\n\n" + f"\n\nExample response:\n{out_example}\n"
 
     def _wrap(self, value):
