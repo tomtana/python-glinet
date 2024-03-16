@@ -83,6 +83,8 @@ class GlInet:
         self._login_cache_path = os.path.join(self._cache_folder, "login.pkl")
         self._api_reference_cache_path = os.path.join(self._cache_folder, "api_reference.pkl")
         self._api_reference_url = api_reference_url
+        self._api_reference_fallback_url = ("https://raw.githubusercontent.com/gl-inet/docs3.x/"
+                                            "master/ressources/api_reference.json")
         self._api_desciption = self.__load_api_desciption(update_api_reference_cache)
         self._keep_alive_interrupt_event = threading.Event()
 
@@ -344,10 +346,18 @@ class GlInet:
         """
         api_description = None
         if update or not os.path.exists(self._api_reference_cache_path):
-            logging.info(f"Loading api description from {self._api_reference_url}")
-            resp = requests.get(self._api_reference_url)
-            api_description = resp.json()["data"]
-            api_description = {utils.sanitize_string(i["module_name"][0]): i for i in api_description}
+            try:
+                logging.info(f"Loading api description from {self._api_reference_url}")
+                resp = requests.get(self._api_reference_url)
+                api_description = resp.json()["data"]
+                api_description = {utils.sanitize_string(i["module_name"][0]): i for i in api_description}
+            except Exception:
+                logging.warning((f"Something went wrong loading the api reference from {self._api_reference_url}. "
+                                 f"Falling back to {self._api_reference_fallback_url}")
+                                )
+                resp = requests.get(self._api_reference_fallback_url)
+                api_description = resp.json()
+
             with open(self._api_reference_cache_path, "wb") as f:
                 logging.info(f"Updating cache file {self._api_reference_cache_path}")
                 pickle.dump(api_description, f)
