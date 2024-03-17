@@ -3,25 +3,26 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import os, sys
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-
-project = 'python-glinet'
-copyright = '2022, Tomtana'
-author = 'Tomtana'
-
+project = "python-glinet"
+copyright = "2022, Tomtana"
+author = "Tomtana"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['myst_parser', 'sphinx.ext.autodoc', 'sphinx_toolbox.collapse', "sphinx.ext.viewcode"]
+extensions = [
+    "myst_parser",
+    "sphinx.ext.autodoc",
+    "sphinx_toolbox.collapse",
+    "sphinx.ext.viewcode",
+]
 
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-autoclass_content = 'both'
-
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+autoclass_content = "both"
 
 
 # -- Options for HTML output -------------------------------------------------

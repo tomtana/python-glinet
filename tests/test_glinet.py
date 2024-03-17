@@ -1,15 +1,13 @@
-import time
-import pytest
-from pyglinet import GlInet, exceptions, decorators
-import pyglinet.glinet_api as glinet_api
-
 import os
-import sys
-from contextlib import contextmanager
 import pathlib
+import sys
+import time
+from contextlib import contextmanager
+from io import StringIO
 
+import pyglinet.glinet_api as glinet_api
 import pytest
-from pyglinet import GlInet, exceptions
+from pyglinet import GlInet, decorators, exceptions
 
 
 @contextmanager
@@ -47,7 +45,9 @@ def test_login_logout_caching(glinet_base):
     api_client2 = glinet_base.api
     assert api_client2 == api_client1, "Clients should be the same"
     api_client3 = glinet_base.get_api_client(True)
-    assert api_client1 == api_client2 != api_client3, "api_client3 should be different from api_client1 and api_client2"
+    assert (
+        api_client1 == api_client2 != api_client3
+    ), "api_client3 should be different from api_client1 and api_client2"
     assert decorators._is_alive(api_client3), "Connection is not alive"
     glinet_base.logout()
 
@@ -56,9 +56,12 @@ def test_login_logout_caching(glinet_base):
     time.sleep(0.3)
     assert glinet_base.logout(), "Logout was not successful"
     assert not glinet_base.is_alive(), "client is still alive"
-    assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
-    assert os.path.exists(glinet_base._api_reference_cache_path), "Api cache file was not created."
-
+    assert os.path.exists(
+        glinet_base._login_cache_path
+    ), "Login cache file was not created."
+    assert os.path.exists(
+        glinet_base._api_reference_cache_path
+    ), "Api cache file was not created."
 
     # check if data is loaded from cache
     gl = GlInet()
@@ -69,7 +72,7 @@ def test_login_logout_caching(glinet_base):
     gl = GlInet(cache_folder=cache_folder)
     with pytest.raises(FileExistsError):
         gl = GlInet(cache_folder="/doesnt_exist")
-    with replace_stdin(StringIO("jdlkjLJlkd=(//&%/&dskdBBDs192837")) as s:
+    with replace_stdin(StringIO("jdlkjLJlkd=(//&%/&dskdBBDs192837")):
         gl = GlInet(keep_alive=False)
         os.remove(gl._login_cache_path)
         time.sleep(0.3)
@@ -99,7 +102,7 @@ def test_keep_alive(glinet_base):
     time.sleep(0.3)
     glinet_base.login()
     assert glinet_base._thread.is_alive(), "Keep alive thread not working"
-    with pytest.raises(exceptions.MethodNotFoundError) as e:
+    with pytest.raises(exceptions.MethodNotFoundError):
         glinet_base.request("call", ["non_existent", "parameter"])
     assert glinet_base._thread.is_alive(), "Keep alive thread not working"
     assert glinet_base.is_alive(), "Not logged in"
@@ -112,14 +115,15 @@ def test_keep_alive(glinet_base):
 @pytest.mark.vcr()
 def test_unsuccessful_login():
     glinet_test = GlInet(password="wrong_password")
-    with pytest.raises(exceptions.AccessDeniedError) as e:
+    with pytest.raises(exceptions.AccessDeniedError):
         glinet_test.login()
     assert not os.path.exists(
-        glinet_test._login_cache_path), "Login cache file was not deleted after entering wrong credentials."
+        glinet_test._login_cache_path
+    ), "Login cache file was not deleted after entering wrong credentials."
     assert glinet_test._thread is None, "Keep alive thread running"
-    with pytest.raises(exceptions.NotLoggedInError) as e:
+    with pytest.raises(exceptions.NotLoggedInError):
         glinet_test.get_api_client()
-    with pytest.raises(exceptions.NotLoggedInError) as e:
+    with pytest.raises(exceptions.NotLoggedInError):
         glinet_test.request("call", ["led", "get-config"])
 
 
@@ -143,10 +147,14 @@ def test_api_client_01(glinet_base):
     assert not api_client.led.get_config().led_enable, "Value has not been set"
     api_client.led.set_config({"led_enable": True})
     assert api_client.led.get_config().led_enable, "Value has not been set"
-    with(pytest.raises(exceptions.WrongApiDescriptionError)):
-        glinet_api.GlInetApi([{"test_0": [{"test_1": [{"test_2"}]}]}], glinet_base._session)
-    with(pytest.raises(exceptions.WrongApiDescriptionError)):
-        glinet_api.GlInetApi({"test_0": [{"test_1": [{"test_2"}]}]}, glinet_base._session)
+    with pytest.raises(exceptions.WrongApiDescriptionError):
+        glinet_api.GlInetApi(
+            [{"test_0": [{"test_1": [{"test_2"}]}]}], glinet_base._session
+        )
+    with pytest.raises(exceptions.WrongApiDescriptionError):
+        glinet_api.GlInetApi(
+            {"test_0": [{"test_1": [{"test_2"}]}]}, glinet_base._session
+        )
     str(glinet_base.api.led.set_config.data)
     repr(glinet_base.api.led.set_config.data)
     str(api_client.clients.get_status)
@@ -162,18 +170,18 @@ def test_requests(glinet_base):
     time.sleep(0.3)
     glinet_base.login()
     api_client = glinet_base.get_api_client()
-    with(pytest.raises(exceptions.LoggedInError)):
+    with pytest.raises(exceptions.LoggedInError):
         glinet_base.request("login", {})
     with pytest.raises(exceptions.WrongParametersError):
         glinet_base.request("call", ["wrong_parameter"])
     with pytest.raises(exceptions.MethodNotFoundError):
         glinet_base.request("call", ["led", "wrong_method"])
     glinet_base.logout()
-    with(pytest.raises(exceptions.NotLoggedInError)):
+    with pytest.raises(exceptions.NotLoggedInError):
         glinet_base.request("logout", {})
-    with(pytest.raises(exceptions.NotLoggedInError)):
+    with pytest.raises(exceptions.NotLoggedInError):
         glinet_base.request("call", ["whatever", "is_here"])
-    with(pytest.raises(exceptions.NotLoggedInError)):
+    with pytest.raises(exceptions.NotLoggedInError):
         api_client.led.get_config()
 
 
