@@ -6,13 +6,12 @@ from typing import Any, Dict, List, Union
 from tabulate import tabulate
 
 import pyglinet.exceptions as exceptions
-from pyglinet import GlInet
 
 log = logging.getLogger(__name__)
 
 
 class GlInetApiCall:
-    def __init__(self, data: dict, session: GlInet):
+    def __init__(self, data: dict, session):
         self._session = session
         for name, value in data.items():
             setattr(self, name, self._wrap(value))
@@ -86,7 +85,7 @@ class GlInetApiProperty:
 
 
 class GlInetApi:
-    def __init__(self, data: dict[str, Any], session: GlInet):
+    def __init__(self, data: dict[str, Any], session):
         self._session = session
         if isinstance(data, dict) and data.get("case_groups_data", None):
             for name, value in data.get("case_groups_data").items():
