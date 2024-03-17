@@ -494,7 +494,7 @@ class GlInet:
             f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()
         ).hexdigest()
 
-    def __load_api_description(self, update: bool = False) -> Optional[dict[str, Any]]:
+    def __load_api_description(self, update: bool = False) -> Optional[Dict[str, Any]]:
         """
         Load api description in json format
 
