@@ -1,5 +1,5 @@
-from collections import namedtuple, OrderedDict
 import re
+from collections import OrderedDict, namedtuple
 
 
 def create_recursive_object(obj, obj_name):
@@ -11,7 +11,9 @@ def create_recursive_object(obj, obj_name):
             rename=True,
         )
         field_value_pairs = OrderedDict(
-            (str(field), create_recursive_object(obj[field], obj_name)) for field in fields)
+            (str(field), create_recursive_object(obj[field], obj_name))
+            for field in fields
+        )
         try:
             return namedtuple_type(**field_value_pairs)
         except TypeError:
@@ -34,14 +36,15 @@ class ResultContainer(dict):
         if isinstance(value, (tuple, list, set, frozenset)):
             return type(value)([self._wrap(v) for v in value])
         else:
-            return ResultContainer(self.name, value) if isinstance(value, dict) else value
+            return (
+                ResultContainer(self.name, value) if isinstance(value, dict) else value
+            )
 
     def __repr__(self):
         return str(self.__dict__)
 
     def __str__(self):
         return str(self.__dict__)
-
 
 
 def sanitize_string(string):

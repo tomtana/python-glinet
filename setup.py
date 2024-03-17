@@ -25,9 +25,9 @@ setuptools.setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     ],
     python_requires=">=3.6",
     install_requires=["ipython", "tabulate", "requests"],
-    packages=setuptools.find_packages()
+    packages=setuptools.find_packages(),
 )
