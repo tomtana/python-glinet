@@ -353,10 +353,14 @@ class GlInet:
                 api_description = resp.json()["data"]
                 api_description = {utils.sanitize_string(i["module_name"][0]): i for i in api_description}
             except Exception:
-                logging.warning(f"Something went wrong loading the api reference from {self._api_reference_url}.")
-                logging.warning(f"Falling back to {self._api_reference_fallback_url}..")
-                resp = requests.get(self._api_reference_fallback_url)
-                api_description = resp.json()
+                try:
+                    logging.warning(f"Something went wrong loading the api reference from {self._api_reference_url}.")
+                    logging.warning(f"Falling back to {self._api_reference_fallback_url}..")
+                    resp = requests.get(self._api_reference_fallback_url)
+                    api_description = resp.json()
+                except Exception:
+                    logging.error(f"Api reference could be loaded. All related functionality will not be available.")
+                    api_description = None
 
             with open(self._api_reference_cache_path, "wb") as f:
                 logging.info(f"Updating cache file {self._api_reference_cache_path}")
@@ -377,4 +381,6 @@ class GlInet:
 
         :return: api client
         """
+        if not self._api_desciption:
+            raise RuntimeError("Api description could not be loaded. Functionality is not not available.")
         return api_helper.GlInetApi(self._api_desciption, self)
