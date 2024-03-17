@@ -1,7 +1,7 @@
 import codecs
 import json
 import logging
-from typing import Any, Dict, List, Union
+from typing import Dict, List, Union
 
 from tabulate import tabulate
 
@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 
 class GlInetApiCall:
-    def __init__(self, data: Dict[str, Any], session):
+    def __init__(self, data, session):
         self._session = session
         for name, value in data.items():
             setattr(self, name, self._wrap(value))
@@ -85,7 +85,7 @@ class GlInetApiProperty:
 
 
 class GlInetApi:
-    def __init__(self, data: Dict[str, Any], session):
+    def __init__(self, data, session):
         self._session = session
         if isinstance(data, dict) and data.get("case_groups_data", None):
             for name, value in data.get("case_groups_data").items():

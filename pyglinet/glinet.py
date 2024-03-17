@@ -9,7 +9,7 @@ import shutil
 import threading
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import requests
 from passlib.hash import md5_crypt as md5
@@ -494,7 +494,7 @@ class GlInet:
             f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()
         ).hexdigest()
 
-    def __load_api_description(self, update: bool = False) -> Optional[Dict[str, Any]]:
+    def __load_api_description(self, update: bool = False):
         """
         Load api description in json format
 
