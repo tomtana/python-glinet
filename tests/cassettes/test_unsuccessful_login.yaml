@@ -1,0 +1,113 @@
+interactions:
+- request:
+    body: '{"jsonrpc": "2.0", "id": 0, "method": "challenge", "params": {"username":
+      "root"}}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '82'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://192.168.8.1/rpc
+  response:
+    body:
+      string: '{"id":0,"jsonrpc":"2.0","result":{"salt":"DiMP9hNV","alg":1,"nonce":"tTcFoBNmUL2jlKyiDiJ0bkURvshu7ySj"}}
+
+        '
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/octet-stream
+      Date:
+      - Sun, 17 Mar 2024 22:34:01 GMT
+      Server:
+      - nginx/1.17.7
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"jsonrpc": "2.0", "id": 1, "method": "challenge", "params": {"username":
+      "root"}}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '82'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://192.168.8.1/rpc
+  response:
+    body:
+      string: '{"id":1,"jsonrpc":"2.0","result":{"salt":"DiMP9hNV","alg":1,"nonce":"HYAlzpykk0oT7komNZqPsgeVDS2leDZT"}}
+
+        '
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/octet-stream
+      Date:
+      - Sun, 17 Mar 2024 22:34:01 GMT
+      Server:
+      - nginx/1.17.7
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"jsonrpc": "2.0", "id": 2, "method": "login", "params": {"username": "root",
+      "hash": "0219bd5fc06848b9500e7b06a9914e82"}}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '122'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.31.0
+    method: POST
+    uri: https://192.168.8.1/rpc
+  response:
+    body:
+      string: '{"id":2,"jsonrpc":"2.0","error":{"message":"Access denied","code":-32000}}
+
+        '
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/octet-stream
+      Date:
+      - Sun, 17 Mar 2024 22:34:02 GMT
+      Server:
+      - nginx/1.17.7
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1
