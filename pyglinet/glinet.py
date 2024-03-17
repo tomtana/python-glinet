@@ -1,20 +1,22 @@
-import time
-import os
-import requests
 import crypt
-import hashlib
 import getpass
-import pyglinet.exceptions as exceptions
-import pyglinet.decorators as decorators
-import re
+import hashlib
 import logging
-import threading
-import warnings
-from pyglinet import utils
-import pyglinet.glinet_api as api_helper
+import os
 import pathlib
 import pickle
-from typing import Union, List, Dict
+import re
+import threading
+import warnings
+from pathlib import Path
+from typing import Dict, List, Union
+
+import requests
+
+import pyglinet.decorators as decorators
+import pyglinet.exceptions as exceptions
+import pyglinet.glinet_api as api_helper
+from pyglinet import utils
 
 
 class GlInet:
@@ -43,26 +45,29 @@ class GlInet:
     :param cache_folder: folder where data is persisted. If left empty, default is `$home/.python-pyglinet`
     """
 
-    def __init__(self,
-                 url: str = "https://192.168.8.1/rpc",
-                 username: str = "root",
-                 password: Union[str, None] = None,
-                 protocol_version: str = "2.0",
-                 keep_alive: bool = True,
-                 keep_alive_intervall: float = 30,
-                 verify_ssl_certificate: bool = False,
-                 update_api_reference_cache: bool = False,
-                 api_reference_url: str = "https://dev.gl-inet.cn/docs/api_docs_api/",
-                 cache_folder: bool = None):
+    def __init__(
+        self,
+        url: str = "https://192.168.8.1/rpc",
+        username: str = "root",
+        password: Union[str, None] = None,
+        protocol_version: str = "2.0",
+        keep_alive: bool = True,
+        keep_alive_intervall: float = 30,
+        verify_ssl_certificate: bool = False,
+        update_api_reference_cache: bool = False,
+        api_reference_url: str = "https://dev.gl-inet.com/router-4.x-api/docs/api_docs_api",
+        cache_folder: Union[str, Path, None] = None,
+    ):
         self._url = url
         self._query_id = 0
         if cache_folder is None:
             self._cache_folder = pathlib.Path.home()
-            self._cache_folder = os.path.join(self._cache_folder, ".python-pyglinet")
+            self._cache_folder = self._cache_folder / ".python-pyglinet"
             logging.info(f"Creating folder {self._cache_folder} if not exist")
-            pathlib.Path(self._cache_folder).mkdir(exist_ok=True)
+            self._cache_folder.mkdir(exist_ok=True)
         else:
-            if os.path.exists(cache_folder):
+            cache_folder = Path(cache_folder)
+            if cache_folder.is_dir():
                 self._cache_folder = cache_folder
             else:
                 raise FileNotFoundError(f"Path {cache_folder} doesnt exist.")
@@ -77,14 +82,20 @@ class GlInet:
         self._lock = threading.Lock()
         self._verify_ssl_certificate = verify_ssl_certificate
         if self._verify_ssl_certificate is False:
-            logging.warning("You disabled ssl certificate validation. Further warning messages will be deactivated.")
-            warnings.filterwarnings('ignore', message='Unverified HTTPS request')
+            logging.warning(
+                "You disabled ssl certificate validation. Further warning messages will be deactivated."
+            )
+            warnings.filterwarnings("ignore", message="Unverified HTTPS request")
         self._cached_login_data = None
         self._login_cache_path = os.path.join(self._cache_folder, "login.pkl")
-        self._api_reference_cache_path = os.path.join(self._cache_folder, "api_reference.pkl")
+        self._api_reference_cache_path = os.path.join(
+            self._cache_folder, "api_reference.pkl"
+        )
         self._api_reference_url = api_reference_url
-        self._api_reference_fallback_url = ("https://raw.githubusercontent.com/tomtana/"
-                                            "python-glinet/main/ressources/api_reference.json")
+        self._api_reference_fallback_url = (
+            "https://raw.githubusercontent.com/tomtana/"
+            "python-glinet/main/ressources/api_reference.json"
+        )
 
         self._api_desciption = self.__load_api_desciption(update_api_reference_cache)
         self._keep_alive_interrupt_event = threading.Event()
@@ -98,7 +109,9 @@ class GlInet:
         self._query_id = (self._query_id + 1) % 9999999999
         return qid
 
-    def __generate_request(self, method: str, params: Union[Dict, List[str], str]) -> dict:
+    def __generate_request(
+        self, method: str, params: Union[Dict, List[str], str]
+    ) -> dict:
         """
         Generate json for rpc api call
         :param method: rpc method
@@ -114,24 +127,26 @@ class GlInet:
                     "jsonrpc": self._protocol_version,
                     "id": self.__generate_query_id(),
                     "method": method,
-                    "params": params_
+                    "params": params_,
                 }
             else:
                 return {
                     "jsonrpc": self._protocol_version,
                     "id": self.__generate_query_id(),
                     "method": method,
-                    "params": [self._sid] + list(params)
+                    "params": [self._sid] + list(params),
                 }
         else:
             return {
                 "jsonrpc": self._protocol_version,
                 "id": self.__generate_query_id(),
                 "method": method,
-                "params": params
+                "params": params,
             }
 
-    def request(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
+    def request(
+        self, method: str, params: Union[Dict, List[str], str]
+    ) -> utils.ResultContainer:
         """
         Send request to router
         :param method: rpc method
@@ -146,12 +161,18 @@ class GlInet:
         if resp.json().get("error", None):
             error_ = resp.json().get("error")
             if error_["code"] == -32000:
-                raise exceptions.AccessDeniedError(f"Access denied, error output: {error_}")
+                raise exceptions.AccessDeniedError(
+                    f"Access denied, error output: {error_}"
+                )
             else:
                 raise ConnectionError(resp.json())
         if resp.status_code != 200:
-            raise ConnectionError(f"Status code {resp.status_code} returned. Response content: \n\n {resp.content}")
-        if resp.json().get("result", None) and resp.json().get("result", None).get("err_msg", None):
+            raise ConnectionError(
+                f"Status code {resp.status_code} returned. Response content: \n\n {resp.content}"
+            )
+        if resp.json().get("result", None) and resp.json().get("result", None).get(
+            "err_msg", None
+        ):
             raise ConnectionError(resp.json())
         return self.__create_object(resp.json(), method, params)
 
@@ -204,11 +225,14 @@ class GlInet:
             # call challenge again since otherwise it will timeout
             challenge = self.__challenge_login()
             login_hash = self.__generate_login_hash(challenge)
-            resp = self.request("login", {"username": self._username,
-                                          "hash": login_hash})
+            resp = self.request(
+                "login", {"username": self._username, "hash": login_hash}
+            )
             self._sid = resp.result.sid
         except exceptions.AccessDeniedError:
-            logging.warning("Could not login with current credentials, deleting cached credentials.")
+            logging.warning(
+                "Could not login with current credentials, deleting cached credentials."
+            )
             self._cached_login_data = None
             os.remove(self._login_cache_path)
             raise
@@ -227,20 +251,26 @@ class GlInet:
             self._thread.start()
 
     def _stop_keep_alive_thread(self):
-        logging.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
+        logging.info(
+            f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds."
+        )
         self._keep_alive_interrupt_event.set()
 
     def __update_login_and_cache(self, challenge, update_password=False):
         password = self._password
 
         if update_password:
-            password = getpass.getpass(prompt='Enter your GL-Inet password')
+            password = getpass.getpass(prompt="Enter your GL-Inet password")
 
-        _hash = self.__generate_unix_passwd_hash(password, challenge.alg, challenge.salt)
-        login_data = {"username": self._username,
-                      "hash": _hash,
-                      "salt": challenge.salt,
-                      "alg": challenge.alg}
+        _hash = self.__generate_unix_passwd_hash(
+            password, challenge.alg, challenge.salt
+        )
+        login_data = {
+            "username": self._username,
+            "hash": _hash,
+            "salt": challenge.salt,
+            "alg": challenge.alg,
+        }
         if login_data != self._cached_login_data:
             self._cached_login_data = login_data
             self.__dump_to_file(self._cached_login_data, self._login_cache_path)
@@ -257,7 +287,7 @@ class GlInet:
             with open(file, "rb") as f:
                 try:
                     loaded_data = pickle.load(f)
-                except:
+                except Exception:
                     logging.warning(f"Something went wrong loading file {file}")
         return loaded_data
 
@@ -281,7 +311,9 @@ class GlInet:
 
         :return: None
         """
-        logging.info(f"Starting keep alive thread at intvervall {self._keep_alive_intervall}")
+        logging.info(
+            f"Starting keep alive thread at intvervall {self._keep_alive_intervall}"
+        )
         while self._keep_alive and not self._keep_alive_interrupt_event.is_set():
             logging.debug(f"keep alive with intervall {self._keep_alive_intervall}")
             if not self.is_alive():
@@ -300,7 +332,7 @@ class GlInet:
         if self._sid is None:
             return False
         try:
-            resp = self.request("alive", {"sid": self._sid})
+            self.request("alive", {"sid": self._sid})
         except exceptions.AccessDeniedError:
             return False
         return True
@@ -334,7 +366,9 @@ class GlInet:
 
         :return: authentication hash
         """
-        return hashlib.md5(f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()).hexdigest()
+        return hashlib.md5(
+            f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()
+        ).hexdigest()
 
     def __load_api_desciption(self, update: bool = False):
         """
@@ -351,15 +385,24 @@ class GlInet:
                 logging.info(f"Loading api description from {self._api_reference_url}")
                 resp = requests.get(self._api_reference_url)
                 api_description = resp.json()["data"]
-                api_description = {utils.sanitize_string(i["module_name"][0]): i for i in api_description}
+                api_description = {
+                    utils.sanitize_string(i["module_name"][0]): i
+                    for i in api_description
+                }
             except Exception:
                 try:
-                    logging.warning(f"Something went wrong loading the api reference from {self._api_reference_url}.")
-                    logging.warning(f"Falling back to {self._api_reference_fallback_url}..")
+                    logging.warning(
+                        f"Something went wrong loading the api reference from {self._api_reference_url}."
+                    )
+                    logging.warning(
+                        f"Falling back to {self._api_reference_fallback_url}.."
+                    )
                     resp = requests.get(self._api_reference_fallback_url)
                     api_description = resp.json()
                 except Exception:
-                    logging.error(f"Api reference could be loaded. All related functionality will not be available.")
+                    logging.error(
+                        "Api reference could be loaded. All related functionality will not be available."
+                    )
                     api_description = None
 
             with open(self._api_reference_cache_path, "wb") as f:
@@ -382,5 +425,7 @@ class GlInet:
         :return: api client
         """
         if not self._api_desciption:
-            raise RuntimeError("Api description could not be loaded. Functionality is not not available.")
+            raise RuntimeError(
+                "Api description could not be loaded. Functionality is not not available."
+            )
         return api_helper.GlInetApi(self._api_desciption, self)
