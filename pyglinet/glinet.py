@@ -104,10 +104,7 @@ class GlInet:
             self._cache_folder, "api_reference.pkl"
         )
         self._api_reference_url = api_reference_url
-        self._api_reference_fallback_url = (
-            "https://raw.githubusercontent.com/tomtana/"
-            "python-glinet/main/ressources/api_reference.json"
-        )
+        self._api_reference_fallback_url = "https://raw.githubusercontent.com/tomtana/python-glinet/add_fallback_api_ressource/ressources/api_reference.json"
 
         self._api_description = self.__load_api_description(update_api_reference_cache)
         self._api: Optional[api_helper.GlInetApi] = None
@@ -528,16 +525,14 @@ class GlInet:
                     api_description = resp.json()
                 except Exception:
                     logging.error(
-                        "Api reference could be loaded. All related functionality will not be available."
+                        "Api reference could not be loaded. All related functionality will not be available."
                     )
-                    api_description = None
+                    return None
 
-            with open(self._api_reference_cache_path, "wb") as f:
-                log.info(f"Updating cache file {self._api_reference_cache_path}")
-                pickle.dump(api_description, f)
+            log.info(f"Updating cache file {self._api_reference_cache_path}")
+            self.__dump_to_file(api_description, self._api_reference_cache_path)
         else:
-            with open(self._api_reference_cache_path, "rb") as f:
-                api_description = pickle.load(f)
+            api_description = self.__load_if_exist(self._api_reference_cache_path)
 
         return api_description
 
