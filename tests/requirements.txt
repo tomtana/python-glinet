@@ -1,0 +1,4 @@
+pytest
+pytest-vcr
+pytest-mock
+pytest-cov
