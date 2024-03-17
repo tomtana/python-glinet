@@ -9,7 +9,7 @@ import shutil
 import threading
 import warnings
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 from passlib.hash import md5_crypt as md5
@@ -109,8 +109,8 @@ class GlInet:
             "python-glinet/main/ressources/api_reference.json"
         )
 
-        self._api_desciption = self.__load_api_desciption(update_api_reference_cache)
-        self._api = None
+        self._api_description = self.__load_api_description(update_api_reference_cache)
+        self._api: Optional[api_helper.GlInetApi] = None
         self._keep_alive_interrupt_event = threading.Event()
 
     def __del__(self):
@@ -497,7 +497,7 @@ class GlInet:
             f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()
         ).hexdigest()
 
-    def __load_api_description(self, update: bool = False):
+    def __load_api_description(self, update: bool = False) -> Optional[dict[str, Any]]:
         """
         Load api description in json format
 
