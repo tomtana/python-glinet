@@ -451,7 +451,7 @@ class GlInet:
         """
         hash_func = self._auth_hash_map.get(challenge["hash-method"], None)
         if not hash_func:
-            raise exceptions.UnsupportedHashAlgoError(f"The algo {challenge.alg} is not supported. Supported Algos: {self._auth_hash_map}")
+            raise exceptions.UnsupportedHashAlgoError(f"The algo {challenge['hash-method']} is not supported. Supported Algos: {self._auth_hash_map}")
         return hash_func(f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}')
 
     def __load_api_description(self):
