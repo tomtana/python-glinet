@@ -18,6 +18,8 @@ import pathlib
 import pickle
 from typing import Union, List, Dict
 import shutil
+import importlib.resources
+import json
 
 log = logging.getLogger(__name__)
 
@@ -35,11 +37,19 @@ class GlInet:
     which can be constructed via the get_api_client method, or via the request method directly.
     """
 
-    _algo_map = {
+    _pw_crypt_map = {
         "1": lambda passwd, salt: md5.hash(passwd, salt=salt),
         "5": lambda passwd, salt: sha256.hash(passwd, salt=salt, rounds=5000),
         "6": lambda passwd, salt: sha512.hash(passwd, salt=salt, rounds=5000)
     }
+    """map of supported password crypt algorithms"""
+
+    _auth_hash_map = {
+        "md5": lambda x: hashlib.md5(x.encode()).hexdigest(),
+        "sha256": lambda x: hashlib.sha256(x.encode()).hexdigest(),
+        "sha512": lambda x: hashlib.sha512(x.encode()).hexdigest()
+    }
+    """map of supported auth hashing algorithms"""
 
     def __init__(self,
                  url: str = "https://192.168.8.1/rpc",
@@ -49,8 +59,6 @@ class GlInet:
                  keep_alive: bool = True,
                  keep_alive_intervall: float = 30,
                  verify_ssl_certificate: bool = False,
-                 update_api_reference_cache: bool = False,
-                 api_reference_url: str = "https://dev.gl-inet.cn/docs/api_docs_api/",
                  cache_folder: str = None):
         """
         :param url: url to router rpc api
@@ -61,8 +69,6 @@ class GlInet:
         :param keep_alive: if set to True, a background thread will be started to keep the connection alive
         :param keep_alive_intervall: intervall in which the background thread sends requests to the router
         :param verify_ssl_certificate: either True/False or path to certificate.
-        :param update_api_reference_cache: if True, data is loaded from the web, otherwise application tries first to
-            load data from cache.
         :param api_reference_url: url to api description
         :param cache_folder: folder where data is persisted. If left empty, default is `$home/.python-pyglinet`
         """
@@ -93,9 +99,7 @@ class GlInet:
             warnings.filterwarnings('ignore', message='Unverified HTTPS request')
         self._cached_login_data = None
         self._login_cache_path = os.path.join(self._cache_folder, "login.pkl")
-        self._api_reference_cache_path = os.path.join(self._cache_folder, "api_reference.pkl")
-        self._api_reference_url = api_reference_url
-        self._api_description = self.__load_api_description(update_api_reference_cache)
+        self._api_description = self.__load_api_description()
         self._api = None
         self._keep_alive_interrupt_event = threading.Event()
 
@@ -432,9 +436,9 @@ class GlInet:
 
         :return: hash
         """
-        hash_func = self._algo_map.get(f"{alg}", None)
+        hash_func = self._pw_crypt_map.get(f"{alg}", None)
         if not hash_func:
-            raise exceptions.UnsupportedHashAlgoError(f"The algo {alg} is not supported. Supported Algos: {self._algo_map}")
+            raise exceptions.UnsupportedHashAlgoError(f"The algo {alg} is not supported. Supported Algos: {self._pw_crypt_map}")
         return hash_func(password, salt=salt)
 
     def __generate_login_hash(self, challenge):
@@ -445,9 +449,14 @@ class GlInet:
 
         :return: authentication hash
         """
-        return hashlib.md5(f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}'.encode()).hexdigest()
+        # hash-method property is not available in firmware < 4.8, so set md5 as default
+        hash_name = challenge.get("hash-method", "md5")
+        hash_func = self._auth_hash_map.get(hash_name, None)
+        if not hash_func:
+            raise exceptions.UnsupportedHashAlgoError(f"The algo {challenge['hash-method']} is not supported. Supported Algos: {self._auth_hash_map}")
+        return hash_func(f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}')
 
-    def __load_api_description(self, update: bool = False):
+    def __load_api_description(self):
         """
         Load api description in json format
 
@@ -457,30 +466,21 @@ class GlInet:
         :return: api description
         """
         api_description = None
-        if update or not os.path.exists(self._api_reference_cache_path):
-            log.info(f"Loading api description from {self._api_reference_url}")
-            resp = requests.get(self._api_reference_url)
-            api_description = resp.json()["data"]
-            api_description = {utils.sanitize_string(i["module_name"][0]): i for i in api_description}
-            pathlib.Path(self._cache_folder).mkdir(exist_ok=True)
-            with open(self._api_reference_cache_path, "wb") as f:
-                log.info(f"Updating cache file {self._api_reference_cache_path}")
-                pickle.dump(api_description, f)
-        else:
-            with open(self._api_reference_cache_path, "rb") as f:
-                api_description = pickle.load(f)
+        log.info("Loading api description from package data")
+        with importlib.resources.open_text('pyglinet.api', 'api_description.json') as f:
+            api_description = json.load(f)
 
         return api_description
 
     @decorators.login_required
-    def get_api_client(self, update_description=False) -> api_helper.GlInetApi:
+    def get_api_client(self) -> api_helper.GlInetApi:
         """
         Create GlInetApi object client to access api functions
 
         :param update_description: if True, api description is updated from web
         :return: GlInetApi
         """
-        if not self._api_description or update_description:
+        if not self._api_description:
             self._api_description = self.__load_api_description(True)
             self._api = api_helper.GlInetApi(self._api_description, self)
         if not self._api:
