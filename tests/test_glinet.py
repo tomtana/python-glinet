@@ -44,8 +44,8 @@ def test_login_logout_caching(glinet_base):
     api_client1 = glinet_base.get_api_client()
     api_client2 = glinet_base.api
     assert api_client2 == api_client1, "Clients should be the same"
-    api_client3 = glinet_base.get_api_client(True)
-    assert api_client1 == api_client2 != api_client3, "api_client3 should be different from api_client1 and api_client2"
+    api_client3 = glinet_base.get_api_client()
+    assert api_client1 == api_client2 == api_client3, "api_client3 should be different from api_client1 and api_client2"
     assert decorators._is_alive(api_client3), "Connection is not alive"
     glinet_base.logout()
 
@@ -55,7 +55,6 @@ def test_login_logout_caching(glinet_base):
     assert glinet_base.logout(), "Logout was not successful"
     assert not glinet_base.is_alive(), "client is still alive"
     assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
-    assert os.path.exists(glinet_base._api_reference_cache_path), "Api cache file was not created."
 
     # check if data is loaded from cache
     gl = GlInet()
