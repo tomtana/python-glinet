@@ -473,14 +473,14 @@ class GlInet:
         return api_description
 
     @decorators.login_required
-    def get_api_client(self, update_description=False) -> api_helper.GlInetApi:
+    def get_api_client(self) -> api_helper.GlInetApi:
         """
         Create GlInetApi object client to access api functions
 
         :param update_description: if True, api description is updated from web
         :return: GlInetApi
         """
-        if not self._api_description or update_description:
+        if not self._api_description:
             self._api_description = self.__load_api_description(True)
             self._api = api_helper.GlInetApi(self._api_description, self)
         if not self._api:
