@@ -24,7 +24,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     install_requires=["ipython", "tabulate", "requests", "passlib"],
     packages=setuptools.find_packages(),
     package_data={'pyglinet': ['api/*.json']},
