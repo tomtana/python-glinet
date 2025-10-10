@@ -26,7 +26,7 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires=["ipython", "tabulate", "requests", "passlib"],
-    packages=setuptools.find_packages()
+    packages=setuptools.find_packages(),
     package_data={'pyglinet': ['api/*.json']},
     include_package_data=True,
 )
