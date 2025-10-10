@@ -37,19 +37,19 @@ class GlInet:
     which can be constructed via the get_api_client method, or via the request method directly.
     """
 
-    "map of supported password crypt algorithms"
     _pw_crypt_map = {
         "1": lambda passwd, salt: md5.hash(passwd, salt=salt),
         "5": lambda passwd, salt: sha256.hash(passwd, salt=salt, rounds=5000),
         "6": lambda passwd, salt: sha512.hash(passwd, salt=salt, rounds=5000)
     }
+    """map of supported password crypt algorithms"""
 
-    "map of supported auth hashing algorithms"
     _auth_hash_map = {
         "md5": lambda x: hashlib.md5(x.encode()).hexdigest(),
         "sha256": lambda x: hashlib.sha256(x.encode()).hexdigest(),
         "sha512": lambda x: hashlib.sha512(x.encode()).hexdigest()
     }
+    """map of supported auth hashing algorithms"""
 
     def __init__(self,
                  url: str = "https://192.168.8.1/rpc",
@@ -453,7 +453,7 @@ class GlInet:
         hash_name = challenge.get("hash-method", "md5")
         hash_func = self._auth_hash_map.get(hash_name, None)
         if not hash_func:
-            raise exceptions.UnsupportedHashAlgoError(f"The algo {challenge.alg} is not supported. Supported Algos: {self._auth_hash_map}")
+            raise exceptions.UnsupportedHashAlgoError(f"The algo {challenge['hash-method']} is not supported. Supported Algos: {self._auth_hash_map}")
         return hash_func(f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}')
 
     def __load_api_description(self):
