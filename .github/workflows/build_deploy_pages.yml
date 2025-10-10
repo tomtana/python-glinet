@@ -45,7 +45,7 @@ jobs:
       - name: Move ressources to html folder
         run: echo "$(ls -l docs/_build/html)";echo "Current user is $(id)";cp -r ressources docs/_build/html
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
           path: 'docs/_build/html'
