@@ -8,7 +8,7 @@ with open("LICENSE", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="python-glinet",
-    version="0.7.0",
+    version="0.8.0",
     author="Tomtana",
     author_email="python@tomtana.net",
     description="Python3 client for Gl.Inet LUCI API firmware 4.0 onwards.",
@@ -27,4 +27,6 @@ setuptools.setup(
     python_requires=">=3.6",
     install_requires=["ipython", "tabulate", "requests", "passlib"],
     packages=setuptools.find_packages()
+    package_data={'pyglinet': ['api/*.json']},
+    include_package_data=True,
 )
