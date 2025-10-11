@@ -69,7 +69,6 @@ class GlInet:
         :param keep_alive: if set to True, a background thread will be started to keep the connection alive
         :param keep_alive_intervall: intervall in which the background thread sends requests to the router
         :param verify_ssl_certificate: either True/False or path to certificate.
-        :param api_reference_url: url to api description
         :param cache_folder: folder where data is persisted. If left empty, default is `$home/.python-pyglinet`
         """
         self._url = url
@@ -460,9 +459,6 @@ class GlInet:
         """
         Load api description in json format
 
-        :param update: if true, the api description is loaded from the web. If false, the program first tries to load
-            the data from the cache and in case this fails from the web.
-
         :return: api description
         """
         api_description = None
@@ -477,7 +473,6 @@ class GlInet:
         """
         Create GlInetApi object client to access api functions
 
-        :param update_description: if True, api description is updated from web
         :return: GlInetApi
         """
         if not self._api_description:

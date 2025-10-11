@@ -4,7 +4,9 @@ name: Generate Markdown Readme
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -33,6 +35,8 @@ jobs:
           git config --global user.name 'GH Action'
           git config --global user.email 'python@tomtana.net'
           git add README.md
-          git diff-index --quiet HEAD || git commit -m "auto README.md generation"
-          git push
+          if ! git diff --cached --quiet; then
+            git commit -m "auto README.md generation"
+            git push
+          fi
 
