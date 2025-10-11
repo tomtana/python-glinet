@@ -37,6 +37,7 @@ jobs:
           git config --global user.name 'GH Action'
           git config --global user.email 'python@tomtana.net'
           git add README.md
+          git commit -m "Auto-update README.md" || echo "No changes to commit"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git push origin HEAD:${{ github.head_ref }}
           else
