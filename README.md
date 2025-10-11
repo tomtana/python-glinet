@@ -1,6 +1,6 @@
 [![GitHub Workflow Status
-(event)](https://img.shields.io/github/workflow/status/tomtana/python-glinet/Python%20package)](https://github.com/tomtana/python-glinet/actions/workflows/python-package.yml)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/tomtana/python-glinet/Deploy%20static%20content%20to%20Pages?label=docs)](https://tomtana.github.io/python-glinet/)
+(event)](https://img.shields.io/github/actions/workflow/status/tomtana/python-glinet/python-tests.yml?branch=main&label=tests)](https://github.com/tomtana/python-glinet/actions/workflows/python-tests.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tomtana/python-glinet/build_deploy_pages.yml?branch=main&label=docs)](https://tomtana.github.io/python-glinet/)
 [![PyPI - Python
 Version](https://img.shields.io/pypi/pyversions/python-glinet)](https://pypi.org/project/python-glinet)
 [![PyPI](https://img.shields.io/pypi/v/python-glinet)](https://pypi.org/project/python-glinet)

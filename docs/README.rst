@@ -147,14 +147,14 @@ License
 
 MIT License. See `LICENSE <https://github.com/tomtana/python-glinet/blob/main/LICENSE>`__.
 
-.. |GitHub Workflow Status (event)| image:: https://img.shields.io/github/workflow/status/tomtana/python-glinet/Python%20package
-   :target: https://github.com/tomtana/python-glinet/actions/workflows/python-package.yml
+.. |GitHub Workflow Status (event)| image:: https://img.shields.io/github/actions/workflow/status/tomtana/python-glinet/python-tests.yml?branch=main&label=tests
+   :target: https://github.com/tomtana/python-glinet/actions/workflows/python-tests.yml
 .. |PyPI - Python Version| image:: https://img.shields.io/pypi/pyversions/python-glinet
    :target: https://pypi.org/project/python-glinet
 .. |PyPI| image:: https://img.shields.io/pypi/v/python-glinet
    :target: https://pypi.org/project/python-glinet
 .. |image3| image:: /resources/python_glinet_demo.gif
-.. |GitHub Pages| image:: https://img.shields.io/github/workflow/status/tomtana/python-glinet/Deploy%20static%20content%20to%20Pages?label=docs
+.. |GitHub Pages| image:: https://img.shields.io/github/actions/workflow/status/tomtana/python-glinet/build_deploy_pages.yml?branch=main&label=docs
    :alt: GitHub Workflow Status
    :target: https://tomtana.github.io/python-glinet/
 .. |Code Cov| image:: https://codecov.io/gh/tomtana/python-glinet/branch/main/graph/badge.svg?token=976L8ESH8K
