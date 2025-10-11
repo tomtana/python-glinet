@@ -57,7 +57,7 @@ class GlInet:
                  password: Union[str, None] = None,
                  protocol_version: str = "2.0",
                  keep_alive: bool = True,
-                 keep_alive_intervall: float = 30,
+                 keep_alive_interval: float = 30,
                  verify_ssl_certificate: bool = False,
                  cache_folder: str = None):
         """
@@ -67,7 +67,7 @@ class GlInet:
             you should never pass your password here.
         :param protocol_version: default 2.0
         :param keep_alive: if set to True, a background thread will be started to keep the connection alive
-        :param keep_alive_intervall: intervall in which the background thread sends requests to the router
+        :param keep_alive_interval: interval in which the background thread sends requests to the router
         :param verify_ssl_certificate: either True/False or path to certificate.
         :param cache_folder: folder where data is persisted. If left empty, default is `$home/.python-pyglinet`
         """
@@ -89,7 +89,7 @@ class GlInet:
         self._session = requests.session()
         self._sid = None
         self._keep_alive = keep_alive
-        self._keep_alive_intervall = keep_alive_intervall
+        self._keep_alive_interval = keep_alive_interval
         self._thread = None
         self._lock = threading.Lock()
         self._verify_ssl_certificate = verify_ssl_certificate
@@ -311,7 +311,7 @@ class GlInet:
         Stop keep alive thread
         """
         if hasattr(self, "_thread") and self._thread and self._thread.is_alive():
-            log.info(f"Shutting down background thread. This will take max {self._keep_alive_intervall} seconds.")
+            log.info(f"Shutting down background thread. This will take max {self._keep_alive_interval} seconds.")
             self._keep_alive_interrupt_event.set()
             self._thread.join()
 
@@ -373,18 +373,18 @@ class GlInet:
         """
         Keep connection alive
 
-        Function is started in background thread (see login() for more details). Send in fixed intervall requests to api.
+        Function is started in background thread (see login() for more details). Send in fixed interval requests to api.
         If not successful, try to connect again.
 
         :return: None
         """
-        log.info(f"Starting keep alive thread at intvervall {self._keep_alive_intervall}")
+        log.info(f"Starting keep alive thread at intvervall {self._keep_alive_interval}")
         while self._keep_alive and not self._keep_alive_interrupt_event.is_set():
-            log.debug(f"keep alive with intervall {self._keep_alive_intervall}")
+            log.debug(f"keep alive with interval {self._keep_alive_interval}")
             if not self.is_alive():
                 log.warning("client disconnected, trying to login again..")
                 self.login()
-            self._keep_alive_interrupt_event.wait(self._keep_alive_intervall)
+            self._keep_alive_interrupt_event.wait(self._keep_alive_interval)
         log.info("Keep alive halted.")
 
     def flush_cache(self) -> None:
