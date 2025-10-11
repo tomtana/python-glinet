@@ -1,4 +1,10 @@
 /venv/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+*.egg
 .idea
 __*/
 /python_glinet.egg-info/*
