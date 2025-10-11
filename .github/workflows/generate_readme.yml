@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
       - name: Convert to Markdown
         run: |
           sudo apt-get install pandoc
@@ -37,6 +39,6 @@ jobs:
           git add README.md
           if ! git diff --cached --quiet; then
             git commit -m "auto README.md generation"
-            git push
+            git push origin HEAD:${GITHUB_REF#refs/heads/}
           fi
 
