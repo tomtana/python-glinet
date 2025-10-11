@@ -44,6 +44,7 @@ jobs:
         pre-commit run -a || exit 1
     - name: Test with pytest
       run: |
+        source .venv/bin/activate
         pytest
   buildall:
     if: ${{ always() }}
