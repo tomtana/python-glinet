@@ -1,6 +1,0 @@
-Sphinx<=5.1.1
-Jinja2
-docutils
-sphinx-rtd-theme
-myst-parser
-sphinx_toolbox
