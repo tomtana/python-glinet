@@ -11,7 +11,6 @@ Introduction
 
 .. image:: https://github.com/tomtana/python-glinet/raw/main/resources/python_glinet_demo.gif
    :alt: python-glinet demonstration
-   :align: center
 
 Features
 --------
