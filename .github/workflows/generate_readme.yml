@@ -37,8 +37,9 @@ jobs:
           git config --global user.name 'GH Action'
           git config --global user.email 'python@tomtana.net'
           git add README.md
-          if ! git diff --cached --quiet; then
-            git commit -m "auto README.md generation"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git push origin HEAD:${{ github.head_ref }}
+          else
             git push origin HEAD:${GITHUB_REF#refs/heads/}
           fi
 
