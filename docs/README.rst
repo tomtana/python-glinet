@@ -13,7 +13,7 @@ python-glinet - A Python3 Client for GL.Inet Router
 -  **Cache for api description and hashed login**
 -  **Configurable background thread to keep connection alive**
 
-.. image:: https://github.com/tomtana/python-glinet/raw/main/ressources/python_glinet_demo.gif
+.. image:: https://github.com/tomtana/python-glinet/raw/main/resources/python_glinet_demo.gif
 
 .. note::
 
@@ -403,7 +403,7 @@ V2.0.0
    :target: https://pypi.org/project/python-glinet
 .. |PyPI| image:: https://img.shields.io/pypi/v/python-glinet
    :target: https://pypi.org/project/python-glinet
-.. |image3| image:: /ressources/python_glinet_demo.gif
+.. |image3| image:: /resources/python_glinet_demo.gif
 .. |GitHub Pages| image:: https://img.shields.io/github/workflow/status/tomtana/python-glinet/Deploy%20static%20content%20to%20Pages?label=docs
    :alt: GitHub Workflow Status
    :target: https://tomtana.github.io/python-glinet/

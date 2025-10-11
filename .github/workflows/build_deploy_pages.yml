@@ -42,8 +42,8 @@ jobs:
         # uses: ammaraskar/sphinx-action@8b4f60114d7fd1faeba1a712269168508d4750d2
         #uses: ammaraskar/sphinx-action@0.4
         run: source venv/bin/activate; cd docs; make html; cd ..
-      - name: Move ressources to html folder
-        run: echo "$(ls -l docs/_build/html)";echo "Current user is $(id)";cp -r ressources docs/_build/html
+      - name: Move resources to html folder
+        run: echo "$(ls -l docs/_build/html)";echo "Current user is $(id)";cp -r resources docs/_build/html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
