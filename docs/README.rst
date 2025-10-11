@@ -25,7 +25,7 @@ Features
 .. note::
 
    - Supports firmware 4.x+ only, following GL.iNet's JSON-RPC transition.
-   - Uses archived API snapshot from `Internet Archive <https://web.archive.org/web/20230909030858/https://dev.gl-inet.com/router-4.x-api/>`__ and parses Chinese docs from `GL.iNet <https://dev.gl-inet.cn/docs/api_docs_page>`__. English docs will be added when available.
+   - Uses archived API snapshot from `Internet Archive <https://web.archive.org/web/20230909030858/https://dev.gl-inet.com/router-4.x-api/>`__ .
 
 Installation
 ------------
@@ -135,7 +135,6 @@ Roadmap
 - [x] Tests and coverage
 - [x] Windows compatibility
 - [ ] Terminal wrapper
-- [ ] Asyncio support
 
 Contributing
 ------------
