@@ -37,7 +37,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install uv
         uv sync
-        source .venv/bin/activate || source .venv\Scripts\activate
+        source .venv/bin/activate || source .venv/Scripts/activate
         echo PATH=$PATH >> $GITHUB_ENV
         pre-commit install
     - name: Lint with ruff
