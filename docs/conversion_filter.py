@@ -5,11 +5,11 @@ from pandocfilters import (
     Emph,
     Para,
     Plain,
+    RawBlock,
     Str,
     Strong,
-    RawBlock,
     stringify,
-    toJSONFilters
+    toJSONFilters,
 )
 
 
@@ -19,7 +19,6 @@ def remove_collapse(key, value, format, meta):
             return CodeBlock(*value[1][1].get("c"))
     except IndexError:
         return None
-
 
 
 def convert_warning(key, value, format, meta):
@@ -33,7 +32,9 @@ def convert_warning(key, value, format, meta):
                 if item["t"] == "BulletList":
                     for bullet in item["c"]:
                         # Stringify bullet and prepend "> - " for bullet lists
-                        bullet_text = "> - " + " ".join(stringify(subitem) for subitem in bullet)
+                        bullet_text = "> - " + " ".join(
+                            stringify(subitem) for subitem in bullet
+                        )
                         result.append(RawBlock("markdown", bullet_text))
                 elif item["t"] == "Para":
                     # Stringify other elements and prepend "> "
@@ -41,7 +42,6 @@ def convert_warning(key, value, format, meta):
                     result.append(RawBlock("markdown", text))
             # raise Exception([para] + result)
             return [para] + result
-
 
 
 if __name__ == "__main__":
