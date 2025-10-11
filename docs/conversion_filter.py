@@ -21,6 +21,7 @@ def remove_collapse(key, value, format, meta):
         return None
 
 
+
 def convert_warning(key, value, format, meta):
     if key == "Div":
         [[identification, classes, keyvals], content] = value
