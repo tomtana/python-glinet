@@ -1,25 +1,27 @@
-import time
+import getpass
+import hashlib
+import importlib.resources
+import json
+import logging
 import os
+import pathlib
+import pickle
+import re
+import shutil
+import threading
+import time
+import warnings
+from typing import Dict, List, Union
+
 import requests
 from passlib.hash import md5_crypt as md5
 from passlib.hash import sha256_crypt as sha256
 from passlib.hash import sha512_crypt as sha512
-import getpass
-import hashlib
-import pyglinet.exceptions as exceptions
+
 import pyglinet.decorators as decorators
-import re
-import logging
-import threading
-import warnings
-from pyglinet import utils
+import pyglinet.exceptions as exceptions
 import pyglinet.glinet_api as api_helper
-import pathlib
-import pickle
-from typing import Union, List, Dict
-import shutil
-import importlib.resources
-import json
+from pyglinet import utils
 
 log = logging.getLogger(__name__)
 
@@ -40,26 +42,28 @@ class GlInet:
     _pw_crypt_map = {
         "1": lambda passwd, salt: md5.hash(passwd, salt=salt),
         "5": lambda passwd, salt: sha256.hash(passwd, salt=salt, rounds=5000),
-        "6": lambda passwd, salt: sha512.hash(passwd, salt=salt, rounds=5000)
+        "6": lambda passwd, salt: sha512.hash(passwd, salt=salt, rounds=5000),
     }
     """map of supported password crypt algorithms"""
 
     _auth_hash_map = {
         "md5": lambda x: hashlib.md5(x.encode()).hexdigest(),
         "sha256": lambda x: hashlib.sha256(x.encode()).hexdigest(),
-        "sha512": lambda x: hashlib.sha512(x.encode()).hexdigest()
+        "sha512": lambda x: hashlib.sha512(x.encode()).hexdigest(),
     }
     """map of supported auth hashing algorithms"""
 
-    def __init__(self,
-                 url: str = "https://192.168.8.1/rpc",
-                 username: str = "root",
-                 password: Union[str, None] = None,
-                 protocol_version: str = "2.0",
-                 keep_alive: bool = True,
-                 keep_alive_interval: float = 30,
-                 verify_ssl_certificate: bool = False,
-                 cache_folder: str = None):
+    def __init__(
+        self,
+        url: str = "https://192.168.8.1/rpc",
+        username: str = "root",
+        password: Union[str, None] = None,
+        protocol_version: str = "2.0",
+        keep_alive: bool = True,
+        keep_alive_interval: float = 30,
+        verify_ssl_certificate: bool = False,
+        cache_folder: str = None,
+    ):
         """
         :param url: url to router rpc api
         :param username: username, default is root.
@@ -94,8 +98,10 @@ class GlInet:
         self._lock = threading.Lock()
         self._verify_ssl_certificate = verify_ssl_certificate
         if self._verify_ssl_certificate is False:
-            log.warning("You disabled ssl certificate validation. Further warning messages will be deactivated.")
-            warnings.filterwarnings('ignore', message='Unverified HTTPS request')
+            log.warning(
+                "You disabled ssl certificate validation. Further warning messages will be deactivated."
+            )
+            warnings.filterwarnings("ignore", message="Unverified HTTPS request")
         self._cached_login_data = None
         self._login_cache_path = os.path.join(self._cache_folder, "login.pkl")
         self._api_description = self.__load_api_description()
@@ -115,7 +121,9 @@ class GlInet:
         self._query_id = (self._query_id + 1) % 9999999999
         return qid
 
-    def __generate_request(self, method: str, params: Union[Dict, List[str], str]) -> dict:
+    def __generate_request(
+        self, method: str, params: Union[Dict, List[str], str]
+    ) -> dict:
         """
         Generate json for rpc api call
 
@@ -133,24 +141,26 @@ class GlInet:
                     "jsonrpc": self._protocol_version,
                     "id": self.__generate_query_id(),
                     "method": method,
-                    "params": params_
+                    "params": params_,
                 }
             else:
                 return {
                     "jsonrpc": self._protocol_version,
                     "id": self.__generate_query_id(),
                     "method": method,
-                    "params": [self._sid] + list(params)
+                    "params": [self._sid] + list(params),
                 }
         else:
             return {
                 "jsonrpc": self._protocol_version,
                 "id": self.__generate_query_id(),
                 "method": method,
-                "params": params
+                "params": params,
             }
 
-    def __request(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
+    def __request(
+        self, method: str, params: Union[Dict, List[str], str]
+    ) -> utils.ResultContainer:
         """
         Send request to router without considering the current login state. This may lead to misleading error messages.
 
@@ -164,24 +174,35 @@ class GlInet:
         resp = self._session.post(self._url, json=req, verify=False)
         self._lock.release()
         if resp.status_code != 200:
-            raise ConnectionError(f"Status code {resp.status_code} returned. Response content: \n\n {resp.content}")
+            raise ConnectionError(
+                f"Status code {resp.status_code} returned. Response content: \n\n {resp.content}"
+            )
         if resp.json().get("error", None):
             error_ = resp.json().get("error")
             if error_["code"] == -32000:
-                raise exceptions.AccessDeniedError(f"Access denied, error output: {error_}")
+                raise exceptions.AccessDeniedError(
+                    f"Access denied, error output: {error_}"
+                )
             elif error_["code"] == -32602:
-                raise exceptions.WrongParametersError(f"Wrong params in request, error output: {error_}")
+                raise exceptions.WrongParametersError(
+                    f"Wrong params in request, error output: {error_}"
+                )
             elif error_["code"] == -32601:
                 raise exceptions.MethodNotFoundError(
-                    f"Wrong method {req.get('method', None)} in request, error output: {error_}")
+                    f"Wrong method {req.get('method', None)} in request, error output: {error_}"
+                )
             else:
                 raise ConnectionError(resp.json())
-        if resp.json().get("result", None) and resp.json().get("result", None).get("err_msg", None):
+        if resp.json().get("result", None) and resp.json().get("result", None).get(
+            "err_msg", None
+        ):
             raise ConnectionError(resp.json())
         return self.__create_object(resp.json(), method, params)
 
     @decorators.login_required
-    def __request_with_sid(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
+    def __request_with_sid(
+        self, method: str, params: Union[Dict, List[str], str]
+    ) -> utils.ResultContainer:
         """
         Request which requires prior login
 
@@ -193,7 +214,9 @@ class GlInet:
         return self.__request(method, params)
 
     @decorators.logout_required
-    def __request_without_sid(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
+    def __request_without_sid(
+        self, method: str, params: Union[Dict, List[str], str]
+    ) -> utils.ResultContainer:
         """
         Request which requires to be logged out
 
@@ -204,7 +227,9 @@ class GlInet:
         """
         return self.__request(method, params)
 
-    def request(self, method: str, params: Union[Dict, List[str], str]) -> utils.ResultContainer:
+    def request(
+        self, method: str, params: Union[Dict, List[str], str]
+    ) -> utils.ResultContainer:
         """
         Send request. Function checks if method requires login and chooses the respective request wrapper.
         see :meth:`~pyglinet.GlInet.__request_with_sid` and :meth:`~pyglinet.GlInet.__request`
@@ -275,11 +300,14 @@ class GlInet:
             # call challenge again since otherwise it will timeout
             challenge = self.__challenge_login()
             login_hash = self.__generate_login_hash(challenge)
-            resp = self.request("login", {"username": self._username,
-                                          "hash": login_hash})
+            resp = self.request(
+                "login", {"username": self._username, "hash": login_hash}
+            )
             self._sid = resp.result.sid
         except exceptions.AccessDeniedError:
-            log.warning("Could not login with current credentials, deleting cached credentials.")
+            log.warning(
+                "Could not login with current credentials, deleting cached credentials."
+            )
             self._cached_login_data = None
             self._sid = None
             os.remove(self._login_cache_path)
@@ -304,14 +332,18 @@ class GlInet:
             self._thread = threading.Thread(target=self.__keep_alive)
             self._thread.start()
         else:
-            raise exceptions.KeepAliveThreadActiveError("Keep alive thread is already alive.")
+            raise exceptions.KeepAliveThreadActiveError(
+                "Keep alive thread is already alive."
+            )
 
     def _stop_keep_alive_thread(self):
         """
         Stop keep alive thread
         """
         if hasattr(self, "_thread") and self._thread and self._thread.is_alive():
-            log.info(f"Shutting down background thread. This will take max {self._keep_alive_interval} seconds.")
+            log.info(
+                f"Shutting down background thread. This will take max {self._keep_alive_interval} seconds."
+            )
             self._keep_alive_interrupt_event.set()
             self._thread.join()
 
@@ -326,13 +358,17 @@ class GlInet:
         password = self._password
 
         if update_password:
-            password = getpass.getpass(prompt='Enter your GL-Inet password')
+            password = getpass.getpass(prompt="Enter your GL-Inet password")
 
-        _hash = self.__generate_unix_passwd_hash(password, challenge.alg, challenge.salt)
-        login_data = {"username": self._username,
-                      "hash": _hash,
-                      "salt": challenge.salt,
-                      "alg": challenge.alg}
+        _hash = self.__generate_unix_passwd_hash(
+            password, challenge.alg, challenge.salt
+        )
+        login_data = {
+            "username": self._username,
+            "hash": _hash,
+            "salt": challenge.salt,
+            "alg": challenge.alg,
+        }
         if login_data != self._cached_login_data:
             self._cached_login_data = login_data
             self.__dump_to_file(self._cached_login_data, self._login_cache_path)
@@ -378,7 +414,9 @@ class GlInet:
 
         :return: None
         """
-        log.info(f"Starting keep alive thread at intvervall {self._keep_alive_interval}")
+        log.info(
+            f"Starting keep alive thread at intvervall {self._keep_alive_interval}"
+        )
         while self._keep_alive and not self._keep_alive_interrupt_event.is_set():
             log.debug(f"keep alive with interval {self._keep_alive_interval}")
             if not self.is_alive():
@@ -437,7 +475,9 @@ class GlInet:
         """
         hash_func = self._pw_crypt_map.get(f"{alg}", None)
         if not hash_func:
-            raise exceptions.UnsupportedHashAlgoError(f"The algo {alg} is not supported. Supported Algos: {self._pw_crypt_map}")
+            raise exceptions.UnsupportedHashAlgoError(
+                f"The algo {alg} is not supported. Supported Algos: {self._pw_crypt_map}"
+            )
         return hash_func(password, salt=salt)
 
     def __generate_login_hash(self, challenge):
@@ -452,8 +492,12 @@ class GlInet:
         hash_name = challenge.get("hash-method", "md5")
         hash_func = self._auth_hash_map.get(hash_name, None)
         if not hash_func:
-            raise exceptions.UnsupportedHashAlgoError(f"The algo {challenge['hash-method']} is not supported. Supported Algos: {self._auth_hash_map}")
-        return hash_func(f'{self._username}:{self._cached_login_data["hash"]}:{challenge.nonce}')
+            raise exceptions.UnsupportedHashAlgoError(
+                f"The algo {challenge['hash-method']} is not supported. Supported Algos: {self._auth_hash_map}"
+            )
+        return hash_func(
+            f"{self._username}:{self._cached_login_data['hash']}:{challenge.nonce}"
+        )
 
     def __load_api_description(self):
         """
@@ -463,7 +507,7 @@ class GlInet:
         """
         api_description = None
         log.info("Loading api description from package data")
-        with importlib.resources.open_text('pyglinet.api', 'api_description.json') as f:
+        with importlib.resources.open_text("pyglinet.api", "api_description.json") as f:
             api_description = json.load(f)
 
         return api_description

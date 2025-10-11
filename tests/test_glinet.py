@@ -1,12 +1,14 @@
-import time
-import pytest
-from pyglinet import GlInet, exceptions, decorators
-import pyglinet.glinet_api as glinet_api
 import os
-import sys
-from io import StringIO
-from contextlib import contextmanager
 import pathlib
+import sys
+import time
+from contextlib import contextmanager
+from io import StringIO
+
+import pytest
+
+import pyglinet.glinet_api as glinet_api
+from pyglinet import GlInet, decorators, exceptions
 
 
 @contextmanager
@@ -45,7 +47,9 @@ def test_login_logout_caching(glinet_base):
     api_client2 = glinet_base.api
     assert api_client2 == api_client1, "Clients should be the same"
     api_client3 = glinet_base.get_api_client()
-    assert api_client1 == api_client2 == api_client3, "api_client3 should be different from api_client1 and api_client2"
+    assert api_client1 == api_client2 == api_client3, (
+        "api_client3 should be different from api_client1 and api_client2"
+    )
     assert decorators._is_alive(api_client3), "Connection is not alive"
     glinet_base.logout()
 
@@ -54,7 +58,9 @@ def test_login_logout_caching(glinet_base):
     time.sleep(0.3)
     assert glinet_base.logout(), "Logout was not successful"
     assert not glinet_base.is_alive(), "client is still alive"
-    assert os.path.exists(glinet_base._login_cache_path), "Login cache file was not created."
+    assert os.path.exists(glinet_base._login_cache_path), (
+        "Login cache file was not created."
+    )
 
     # check if data is loaded from cache
     gl = GlInet()
@@ -110,8 +116,9 @@ def test_unsuccessful_login():
     glinet_test = GlInet(password="wrong_password")
     with pytest.raises(exceptions.AccessDeniedError) as e:
         glinet_test.login()
-    assert not os.path.exists(
-        glinet_test._login_cache_path), "Login cache file was not deleted after entering wrong credentials."
+    assert not os.path.exists(glinet_test._login_cache_path), (
+        "Login cache file was not deleted after entering wrong credentials."
+    )
     assert glinet_test._thread is None, "Keep alive thread running"
     with pytest.raises(exceptions.NotLoggedInError) as e:
         glinet_test.get_api_client()
@@ -139,10 +146,14 @@ def test_api_client_01(glinet_base):
     assert not api_client.led.get_config().led_enable, "Value has not been set"
     api_client.led.set_config({"led_enable": True})
     assert api_client.led.get_config().led_enable, "Value has not been set"
-    with(pytest.raises(exceptions.WrongApiDescriptionError)):
-        glinet_api.GlInetApi([{"test_0": [{"test_1": [{"test_2"}]}]}], glinet_base._session)
-    with(pytest.raises(exceptions.WrongApiDescriptionError)):
-        glinet_api.GlInetApi({"test_0": [{"test_1": [{"test_2"}]}]}, glinet_base._session)
+    with pytest.raises(exceptions.WrongApiDescriptionError):
+        glinet_api.GlInetApi(
+            [{"test_0": [{"test_1": [{"test_2"}]}]}], glinet_base._session
+        )
+    with pytest.raises(exceptions.WrongApiDescriptionError):
+        glinet_api.GlInetApi(
+            {"test_0": [{"test_1": [{"test_2"}]}]}, glinet_base._session
+        )
     str(glinet_base.api.led.set_config.data)
     repr(glinet_base.api.led.set_config.data)
     str(api_client.clients.get_status)
@@ -158,18 +169,18 @@ def test_requests(glinet_base):
     time.sleep(0.3)
     glinet_base.login()
     api_client = glinet_base.get_api_client()
-    with(pytest.raises(exceptions.LoggedInError)):
+    with pytest.raises(exceptions.LoggedInError):
         glinet_base.request("login", {})
     with pytest.raises(exceptions.WrongParametersError):
         glinet_base.request("call", ["wrong_parameter"])
     with pytest.raises(exceptions.MethodNotFoundError):
         glinet_base.request("call", ["led", "wrong_method"])
     glinet_base.logout()
-    with(pytest.raises(exceptions.NotLoggedInError)):
+    with pytest.raises(exceptions.NotLoggedInError):
         glinet_base.request("logout", {})
-    with(pytest.raises(exceptions.NotLoggedInError)):
+    with pytest.raises(exceptions.NotLoggedInError):
         glinet_base.request("call", ["whatever", "is_here"])
-    with(pytest.raises(exceptions.NotLoggedInError)):
+    with pytest.raises(exceptions.NotLoggedInError):
         api_client.led.get_config()
 
 

@@ -1,6 +1,52 @@
+[project]
+name = "python-glinet"
+version = "0.8.0"
+description = "Python3 client for Gl.Inet LUCI API firmware 4.0 onwards."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Tomtana", email = "python@tomtana.net" }]
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
+]
+dependencies = [
+    "ipython>=8.18.1",
+    "passlib>=1.7.4",
+    "requests>=2.32.5",
+    "tabulate>=0.9.0",
+]
+
+[project.urls]
+"Bug Tracker" = "https://github.com/tomtana/python-glinet/issues"
+"Documentation" = "https://tomtana.github.io/python-glinet"
+
+
+
+[tool.setuptools]
+packages = ["pyglinet"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+pyglinet = ["api/*.json"]
+
 [build-system]
 requires = [
     "setuptools>=42",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.3.0",
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
+    "pytest-vcr>=1.0.2",
+    "ruff>=0.14.0",
+]
+
+[tool.ruff.lint]
+select = ["I"]
