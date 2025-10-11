@@ -1,11 +1,13 @@
-from tabulate import tabulate
-import pyglinet.decorators as decorators
-import requests
-import pyglinet.exceptions as exceptions
-from typing import Union, List, Dict
-import json
 import codecs
+import json
 import logging
+from typing import Dict, List, Union
+
+import requests
+from tabulate import tabulate
+
+import pyglinet.decorators as decorators
+import pyglinet.exceptions as exceptions
 
 log = logging.getLogger(__name__)
 
@@ -22,13 +24,24 @@ class GlInetApiCall:
             out_example = json.loads(self.out_example)
         except json.decoder.JSONDecodeError as e:
             try:
-                in_example = json.loads(codecs.getdecoder("unicode_escape")(self.in_example)[0])
-                out_example = json.loads(codecs.getdecoder("unicode_escape")(self.out_example)[0])
+                in_example = json.loads(
+                    codecs.getdecoder("unicode_escape")(self.in_example)[0]
+                )
+                out_example = json.loads(
+                    codecs.getdecoder("unicode_escape")(self.out_example)[0]
+                )
             except json.decoder.JSONDecodeError as e:
-                log.debug(f"Could not json decode strings. Writing using now raw ones. {self.in_example}\n{self.out_example}")
+                log.debug(
+                    f"Could not json decode strings. Writing using now raw ones. {self.in_example}\n{self.out_example}"
+                )
                 in_example = self.in_example
                 out_example = self.out_example
-        self.__doc__ = f"\nAvailable parameters (?=optional):\n" + self.__repr__() + f"\n\nExample request:\n{in_example}\n\n" + f"\n\nExample response:\n{out_example}\n"
+        self.__doc__ = (
+            f"\nAvailable parameters (?=optional):\n"
+            + self.__repr__()
+            + f"\n\nExample request:\n{in_example}\n\n"
+            + f"\n\nExample response:\n{out_example}\n"
+        )
 
     def _wrap(self, value):
         if isinstance(value, (tuple, list, set, frozenset)):
@@ -37,7 +50,6 @@ class GlInetApiCall:
             return GlInetApiProperty(value) if isinstance(value, dict) else value
 
     def __call__(self, params: Union[Dict, List, None] = None):
-
         p = []
         if params and isinstance(params, dict):
             p = [params]
@@ -47,8 +59,10 @@ class GlInetApiCall:
         return self._session.request("call", p).result
 
     def __repr__(self):
-        return tabulate([[i.keyName, i.dataType__name, i.desp] for i in self.params],
-                        headers=["Parameter", "Type", "Description"])
+        return tabulate(
+            [[i.keyName, i.dataType__name, i.desp] for i in self.params],
+            headers=["Parameter", "Type", "Description"],
+        )
 
     def __str__(self):
         return self.__repr__()
@@ -82,13 +96,18 @@ class GlInetApi:
             for name, value in data.items():
                 setattr(self, name, self._wrap(value))
         else:
-            raise exceptions.WrongApiDescriptionError(f"Api description has no valid format:\n {data}")
+            raise exceptions.WrongApiDescriptionError(
+                f"Api description has no valid format:\n {data}"
+            )
 
     def _wrap(self, value):
         return GlInetApi(value, self._session)
 
     def __repr__(self):
-        return tabulate([[i] for i in list(self.__dict__.keys()) if not i.startswith("_")], headers=["Function"])
+        return tabulate(
+            [[i] for i in list(self.__dict__.keys()) if not i.startswith("_")],
+            headers=["Function"],
+        )
 
     def __str__(self):
         return str(self.__dict__)

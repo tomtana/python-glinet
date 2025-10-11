@@ -1,4 +1,5 @@
 from functools import wraps
+
 import pyglinet.exceptions as exceptions
 
 
@@ -8,7 +9,9 @@ def login_required(func):
         if _has_sid(self) and _is_alive(self):
             return func(self, *args, **kwargs)
         else:
-            raise exceptions.NotLoggedInError(f"Login is required to execute function {func}.\nCall login() first!")
+            raise exceptions.NotLoggedInError(
+                f"Login is required to execute function {func}.\nCall login() first!"
+            )
 
     return inner_func
 

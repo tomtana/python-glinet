@@ -4,7 +4,9 @@ name: Generate Markdown Readme
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,6 +25,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
       - name: Convert to Markdown
         run: |
           sudo apt-get install pandoc
@@ -33,6 +37,10 @@ jobs:
           git config --global user.name 'GH Action'
           git config --global user.email 'python@tomtana.net'
           git add README.md
-          git diff-index --quiet HEAD || git commit -m "auto README.md generation"
-          git push
+          git commit -m "Auto-update README.md" || echo "No changes to commit"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git push origin HEAD:${{ github.head_ref }}
+          else
+            git push origin HEAD:${GITHUB_REF#refs/heads/}
+          fi
 

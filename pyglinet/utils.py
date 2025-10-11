@@ -1,5 +1,5 @@
-from collections import namedtuple, OrderedDict
 import re
+from collections import OrderedDict, namedtuple
 
 
 class ResultContainer(dict):
@@ -13,7 +13,9 @@ class ResultContainer(dict):
         if isinstance(value, (tuple, list, set, frozenset)):
             return type(value)([self._wrap(v) for v in value])
         else:
-            return ResultContainer(self.name, value) if isinstance(value, dict) else value
+            return (
+                ResultContainer(self.name, value) if isinstance(value, dict) else value
+            )
 
     def __repr__(self):
         return str(self.__dict__)
