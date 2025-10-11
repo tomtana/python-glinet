@@ -32,21 +32,20 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
+      shell: bash
       run: |
         python -m pip install --upgrade pip
         python -m pip install uv
         uv sync
-        if [ "$RUNNER_OS" = "Windows" ]; then
-          .venv\Scripts\activate
-        else
-          source .venv/bin/activate
-        fi
+        source .venv/bin/activate
         echo PATH=$PATH >> $GITHUB_ENV
         pre-commit install
     - name: Lint with ruff
+      shell: bash
       run: |
         pre-commit run -a || exit 1
     - name: Test with pytest
+      shell: bash
       run: |
         pytest
   buildall:
@@ -57,4 +56,5 @@ jobs:
     steps:
       - name: Check build matrix status
         if: ${{ needs.build.result != 'success' }}
+        shell: bash
         run: exit 1
