@@ -140,7 +140,7 @@ response.
 -   \[x\] PyPI package
 -   \[x\] Tests and coverage
 -   \[x\] Windows compatibility
--   \[ \] Terminal wrapper
+-   \[ \] Cli wrapper
 
 ## Contributing
 
