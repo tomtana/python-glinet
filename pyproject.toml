@@ -1,6 +1,6 @@
 [project]
 name = "python-glinet"
-version = "0.8.1"
+version = "0.8.2"
 description = "Python3 client for Gl.Inet LUCI API firmware 4.0 onwards."
 readme = "README.md"
 license = { file = "LICENSE" }
