@@ -12,7 +12,6 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
 ]
 dependencies = [
-    "build>=1.3.0",
     "ipython>=8.18.1",
     "passlib>=1.7.4",
     "requests>=2.32.5",
@@ -22,6 +21,7 @@ dependencies = [
 [project.urls]
 "Bug Tracker" = "https://github.com/tomtana/python-glinet/issues"
 "Documentation" = "https://tomtana.github.io/python-glinet"
+"Source" = "https://github.com/tomtana/python-glinet"
 
 
 
